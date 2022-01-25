@@ -21,7 +21,7 @@ post_msg("#my-bot", ":joy: :ox:")
 '''
 # token = os.environ['SLACK_TOKEN']
 try:
-  client = slack.WebClient('xoxb-4916860785-2689773129490-BTv9P4somjNe7bALbUKzMVSv')
+  client = slack.WebClient('your_token')
   response = client.chat_postMessage(channel="#my-bot", text=":joy: hello world from slackbot!")
 except SlackApiError as e:
   print(e)
@@ -35,7 +35,7 @@ block_text["type"] = "mrkdwn"
 block_text["text"] = ":ox: Danny Torrence left the following review for *your* property:"
 block_content["text"] = block_text
 block_contents.append(block_content)
-client = slack.WebClient('xoxb-4916860785-2689773129490-BTv9P4somjNe7bALbUKzMVSv')
+client = slack.WebClient('your_token')
 client.chat_postMessage(channel="#my-bot", blocks=block_contents)
 
 '''
