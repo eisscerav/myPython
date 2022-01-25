@@ -5,7 +5,7 @@ import os
 
 def post_msg(channel, msg):
   # todo: may configure token as env variable and use os.environ['SLACK_TOKEN']
-  token = 'xoxb-4916860785-2689773129490-BTv9P4somjNe7bALbUKzMVSv'
+  token = 'replace_with_your_token'
   client = slack.WebClient(token)
   try:
     response = client.chat_postMessage(
