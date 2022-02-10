@@ -47,5 +47,11 @@ def test3(file1=r"d:\a.csv", file2=r"d:\b.csv"):
             no_dup.to_csv(f, encoding="GBK", index=False)
 
 
+def test4():
+    df = pd.read_csv(r"nba.csv")
+    columns = df.colomuns
+    print(df.head(5))
+
+
 if __name__ == "__main__":
-    test2()
+    test4()
