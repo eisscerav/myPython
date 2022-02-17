@@ -75,19 +75,19 @@ def test4():
     desc = df.describe()
 
     # make changes to data
-    df['number+age'] = df['Number'] + df['Age']
-    df_1 = df.drop(columns=['number+age'])
+    df['new_col_name'] = df['Number'] + df['Age']
+    df_1 = df.drop(columns=['new_col_name'])
     df_1 = df[['Name', 'Age', 'Team']]
     # save modified df to csv by df.to_csv('new_name.csv') or to excel df.to_excel
     # df.to_csv('new_name.csv', index=False)
-    filter_df1 = df.loc[(df['Age'] == 25) & (df['Position'] == 'SF')]
 
     # filtering data
+    filter_df1 = df.loc[(df['Age'] == 25) & (df['Position'] == 'SF')]
     # filter_df1.reset_index(drop=True) to remove old index
     # filter_df1 = filter_df1.reset_index()
     # filter_df2 = df.loc[(df['Age'] == 25) | (df['Salary'] > 100000)]
     #  df.loc[~df['Name'].str.contains("ph", na=False)] here ~ meaning not
-    # filter_df3 = df.loc[~df['Name'].str.contains("ph", na=False)]
+    # filter_df3 = df.loc[~df['Name'].str.contains("ph", na=False)], use ^ to specify start with. eg; ^ph
     filter_df4 = df.loc[df['Name'].str.contains("ph|ev", na=False, regex=True, flags=re.I)]
 
     # conditional changes
@@ -95,6 +95,23 @@ def test4():
     # df.loc[df['Team'] == 'Brooklyn Nets', 'Team'] = 'Atom nets'
     # df.loc[df['Team'] == 'Brooklyn Nets', 'College'] = 'Asernal'
     # df.loc[df['Weight'] > 210, ['College', 'Salary']] = ['AAAAA', '10020']
+
+    # Aggregate statistics(group by)
+    # https://www.geeksforgeeks.org/python-pandas-dataframe-groupby/
+    gk = df.groupby('Team')
+    gb_dict = {
+        'Age': 'mean',
+        'Salary': 'median'
+    }
+    mean = gk.agg(gb_dict)
+    boston = gk.get_group('Boston Celtics')
+    team_sum = gk.sum()
+    team_median = gk.median()
+
+    # working with large amounts of data
+    for df in pd.read_csv('nba.csv', chunksize=5):
+        pass
+
     print(df.head(2))
 
 
