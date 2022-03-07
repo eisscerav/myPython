@@ -2,6 +2,7 @@ import requests
 import shutil
 import timeit
 import time
+import os
 
 
 def timer_func(func):
@@ -30,13 +31,14 @@ def download_file(url):
     # with requests.get(url, stream=True) as r:
     #     with open(local_filename, 'wb') as f:
     #         shutil.copyfileobj(r.raw, f)
+    r = requests.get(url)
 
     return local_filename
 
 
 if __name__ == '__main__':
     print('Start download_file')
-    url = r'http://scdvstransfer.nvidia.com/dvsshare/vol2/cuda_dev_Release_Linux_AMD64_GPGPU_CUDA_CUFFT/SW_31014917.0_cuda_dev_Release_Linux_AMD64_GPGPU_CUDA_CUFFT.tgz'
+    url = r'http://scdvstransfer.nvidia.com/dvsshare/vol2/cuda_dev_Release_Linux_AMD64_GPGPU_CUDA_CUFFT/SW_31031480.0_cuda_dev_Release_Linux_AMD64_GPGPU_CUDA_CUFFT.tgz'
     download_file(url=url)
     # timer(func=download_file, arg1=url)
     print('Done download_file')
