@@ -1,5 +1,4 @@
 import numpy as np
-from setuptools import sic
 
 
 def demo1():
@@ -43,9 +42,26 @@ def demo1():
     d1 = np.random.randint(10, size=(2, 3))
     d2 = np.random.randint(10, size=(3, 2))
     d3 = np.matmul(d1, d2)
-    # np.linalg.det(d3)
+    det = np.linalg.det(d3)
 
-    # statistics
+    # statistics: axis=1 means row base
+    min_ = np.min(a6, axis=1)
+    sum_ = np.sum(a6)
+
+    # reorganizing array
+    c1 = np.array([[1,2,3,4,5,6], [7,8,9,10,11,12]])
+    reshape = c1.reshape(6, 2)
+
+    v1 = np.vstack([c1, c1])
+    h1 = np.hstack([c1, c1])
+
+    # misc
+    filedata = np.genfromtxt('test.txt', delimiter=',').astype('int')
+
+    # boolean masking and advanced indexing
+    bool_array = filedata > 5
+    ge5 = filedata[(filedata > 5) & (filedata < 9)]
+    filt = ge5[[0, 1]]
     print(a)
 
 
