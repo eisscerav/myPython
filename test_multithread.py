@@ -15,13 +15,18 @@ def show2(arg1, arg2):
 
 
 if __name__ == '__main__':
+    thread_list = []
     for i in range(10):
-        string = str(i).join(" thread(s)")
-        if i%2:
-            t = threading.Thread(target=show1, args=(i, "show1"))
-            t.start()
-        else:
-            t = threading.Thread(target=show2, args=(i, "show2"))
-            t.start()
+        t = threading.Thread(target=show1, args=(i, 'show1'))
+        thread_list.append(t)
+    for t in thread_list:
+        t.start()
+        # string = str(i).join(" thread(s)")
+        # if i%2:
+        #     t = threading.Thread(target=show1, args=(i, "show1"))
+        #     t.start()
+        # else:
+        #     t = threading.Thread(target=show2, args=(i, "show2"))
+        #     t.start()
 
 

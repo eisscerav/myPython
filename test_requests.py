@@ -3,6 +3,7 @@ import shutil
 import timeit
 import time
 import os
+import threading
 
 
 def timer_func(func):
@@ -24,21 +25,38 @@ def timer(func, arg1):
     print('Time: ', stop - start)
 
 
+def write_to_file(filename, chunksize):
+    filename.write(chunksize)
+
 @timer_func
 def download_file(url):
     local_filename = url.split('/')[-1]
     print(local_filename)
+    thread_lst = []
+    response = requests.get(url, stream=True)
+    # fp = open(local_filename, 'wb')
+    # for chunk in response.iter_content(chunk_size=1024):
+    #     t = threading.Thread(target=write_to_file, args=(fp, chunk))
+    #     thread_lst.append(t)
+    # for th in thread_lst:
+    #     th.start()
+    # for th in thread_lst:
+    #     th.join()
+    # fp.close()
+    with open(local_filename, 'wb') as f:
+        for chunk in response.iter_content(chunk_size=4096):
+            f.write(chunk)
     # with requests.get(url, stream=True) as r:
     #     with open(local_filename, 'wb') as f:
     #         shutil.copyfileobj(r.raw, f)
-    r = requests.get(url)
+    # r = requests.get(url)
 
     return local_filename
 
 
 if __name__ == '__main__':
     print('Start download_file')
-    url = r'http://scdvstransfer.nvidia.com/dvsshare/vol2/cuda_dev_Release_Linux_AMD64_GPGPU_CUDA_CUFFT/SW_31031480.0_cuda_dev_Release_Linux_AMD64_GPGPU_CUDA_CUFFT.tgz'
+    url = r'http://dvstransfer.nvidia.com/dvsshare/dvs-binaries/gpu_drv_cuda_a_Release_Linux_AMD64_GPGPU_COMPILER/SW_31051952.0_gpu_drv_cuda_a_Release_Linux_AMD64_GPGPU_COMPILER.tgz'
     download_file(url=url)
     # timer(func=download_file, arg1=url)
     print('Done download_file')
