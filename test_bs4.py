@@ -1,5 +1,8 @@
 from bs4 import BeautifulSoup
+import re
 
+
+# refer to https://beautiful-soup-4.readthedocs.io/en/latest/
 
 html_doc = """
 <html><head><title>The Dormouse's story</title></head>
@@ -60,7 +63,9 @@ def demo():
 def demo1():
     # Multi-valued attributes
     css_soup = BeautifulSoup('<p class="body strikeout"></p>')
-    cls = css_soup.p['class']
+    # cls = css_soup.p['class']
+    cls = css_soup.p.get('class')
+
 
     # more than one value, but it’s not a multi-valued attribute as defined by any version of the HTML standard
     id_soup = BeautifulSoup('<p id="my id"></p>')
@@ -70,7 +75,49 @@ def demo1():
     # multiple attribute values are consolidated
     rel_soup = BeautifulSoup('<p>Back to the <a rel="index">homepage</a></p>')
     rel_soup.a['rel'] = ['index', 'contents']
+    tag_p = rel_soup.p
+
+    # Navigable string
+    soup = BeautifulSoup('<b class="boldest">Extremely bold</b>')
+    tag = soup.b
+    str = tag.string
+    # todo: tag.string = "No longer bold" ??
+    tag.string.replace_with("No longer bold")
+
+    # insert a soup
+    doc = BeautifulSoup("<document><content/>INSERT FOOTER HERE</document", "lxml")
+    footer = BeautifulSoup("<footer>Here's the footer</footer>", "xml")
+    doc.find(text="INSERT FOOTER HERE").replace_with(footer)
+
+    # Searching tree: A regular expression
+    # https://beautiful-soup-4.readthedocs.io/en/latest/#a-regular-expression
+    html_soup = BeautifulSoup(html_doc, 'lxml')
+    for tag in html_soup.find_all(re.compile("^b")):
+        print(tag.name)
+
+    # https://beautiful-soup-4.readthedocs.io/en/latest/#a-list
+    all_a_b = soup.find_all(["a", "b"])
+
+    # find_all: https://beautiful-soup-4.readthedocs.io/en/latest/#find-all
+    all_p_title = soup.find_all("p", "title")
+    soup.find_all(id="link2")
+    soup.find(string=re.compile("sisters"))
+    soup.find_all(href=re.compile("elsie"), id='link1')
+
+    data_soup = BeautifulSoup('<div data-foo="value">foo!</div>')
+    # like the data-* attributes in HTML 5, have names that can’t be used as the names of keyword arguments
+    # data_soup.find_all(data-foo = "value")
+    data_soup.find_all(attrs={"data-foo": "value"})
+
+    # Searching by CSS class
+    # https://beautiful-soup-4.readthedocs.io/en/latest/#searching-by-css-class
+    soup.find_all("a", class_="sister")
+    soup.find_all(class_=re.compile("itl"))
+
+    css_soup.select("p.strikeout.body")
+
     print(rel_soup.p)
+
 
 
 if __name__ == '__main__':
