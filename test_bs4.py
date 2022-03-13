@@ -119,6 +119,5 @@ def demo1():
     print(rel_soup.p)
 
 
-
 if __name__ == '__main__':
-    demo1()
+    QuickStart()
