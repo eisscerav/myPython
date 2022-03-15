@@ -7,3 +7,7 @@ args = parser.parse_args()
 
 #打印姓名
 print(args.family+args.name)
+
+
+if __name__ == '__main__':
+    pass
