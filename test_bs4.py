@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+import bs4
 import re
 
 
@@ -65,8 +66,6 @@ def demo1():
     css_soup = BeautifulSoup('<p class="body strikeout"></p>')
     # cls = css_soup.p['class']
     cls = css_soup.p.get('class')
-
-
     # more than one value, but it’s not a multi-valued attribute as defined by any version of the HTML standard
     id_soup = BeautifulSoup('<p id="my id"></p>')
     ids = id_soup.p['id']
@@ -116,8 +115,97 @@ def demo1():
 
     css_soup.select("p.strikeout.body")
 
+    # going down https://beautiful-soup-4.readthedocs.io/en/latest/#going-down
+    for child in soup.descendants:
+        print(child)
+
+    # going up: https://beautiful-soup-4.readthedocs.io/en/latest/#going-up
+    # going sideways: https://beautiful-soup-4.readthedocs.io/en/latest/#going-sideways
+    # https://beautiful-soup-4.readthedocs.io/en/latest/#going-back-and-forth
+
+    # https://beautiful-soup-4.readthedocs.io/en/latest/#searching-the-tree
+    soup.find_all(["a", "b"])
+
     print(rel_soup.p)
 
 
+def demo2():
+    # https://beautiful-soup-4.readthedocs.io/en/latest/#modifying-the-tree
+    soup = BeautifulSoup('<b class="boldest">Extremely bold</b>')
+    tag = soup.b
+    tag.name = "blockquote"
+    tag['class'] = 'verybold'
+    tag['id'] = 1
+    del tag['class']
+    del tag['id']
+
+    markup = '<a href="http://example.com/">I linked to <i>example.com</i></a>'
+    soup = BeautifulSoup(markup)
+    tag = soup.a
+    tag.string = "New link text."
+
+    soup = BeautifulSoup("<a>Foo</a>")
+    soup.a.append("Bar")
+
+    soup = BeautifulSoup("<a>Soup</a>")
+    soup.a.extend(["'s", " ", "on"])
+
+    soup = BeautifulSoup("<b></b>")
+    tag = soup.b
+    tag.append("Hello")
+    new_string = bs4.NavigableString(" there")
+    tag.append(new_string)
+
+    # new tag
+    soup = BeautifulSoup("<b></b>")
+    original_tag = soup.b
+    new_tag = soup.new_tag("a", href="http://www.example.com")
+    original_tag.append(new_tag)
+    new_tag.string = "Link text."
+
+    markup = '<a href="http://example.com/">I linked to <i>example.com</i></a>'
+    soup = BeautifulSoup(markup)
+    tag = soup.a
+    tag.insert(1, "but did not endorse ")
+
+    soup = BeautifulSoup("<b>stop</b>")
+    tag = soup.new_tag("i")
+    tag.string = "Don't"
+    soup.b.string.insert_before(tag)
+
+    markup = '<a href="http://example.com/">I linked to <i>example.com</i></a>'
+    soup = BeautifulSoup(markup)
+    tag = soup.a
+    tag.clear()
+
+    markup = '<a href="http://example.com/">I linked to <i>example.com</i></a>'
+    soup = BeautifulSoup(markup)
+    a_tag = soup.a
+    i_tag = soup.i.extract()
+
+    markup = '<a href="http://example.com/">I linked to <i>example.com</i></a>'
+    soup = BeautifulSoup(markup)
+    a_tag = soup.a
+    new_tag = soup.new_tag("b")
+    new_tag.string = "example.net"
+    a_tag.i.replace_with(new_tag)
+
+    soup = BeautifulSoup("<p>I wish I was bold.</p>")
+    soup.p.string.wrap(soup.new_tag("b"))
+    soup.p.wrap(soup.new_tag("div"))
+
+    markup = '<a href="http://example.com/">I linked to <i>example.com</i></a>'
+    soup = BeautifulSoup(markup)
+    a_tag = soup.a
+    a_tag.i.unwrap()
+
+    markup = '<a href="http://example.com/">\nI linked to <i>example.com</i>\n</a>'
+    soup = BeautifulSoup(markup)
+    txt = soup.get_text()
+    txt1 = soup.i.get_text()
+
+    print(soup.prettify())
+
+
 if __name__ == '__main__':
-    QuickStart()
+    demo2()
