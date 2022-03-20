@@ -14,7 +14,7 @@ def parse_log():
     error_msg = '' #[]
     # case = ['test_name', 'error_msg', 'passed/failed']
     for idx,  text in enumerate(contents):
-        if running_sym in text and 'cudnnTest -R' in text and debug_sym not in text:
+        if running_sym in text and 'cudnnTest' in text and r'-R' in text and debug_sym not in text:
             current_case = text.replace(running_sym, '')
         if error_sym in text and debug_sym not in text:
             error_msg = text
