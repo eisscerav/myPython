@@ -57,5 +57,3 @@ def getBugs():
 if __name__ == '__main__':
     getBug()
     getBugs()
-
-
