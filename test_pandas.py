@@ -49,7 +49,7 @@ def test3(file1=r"d:\a.csv", file2=r"d:\b.csv"):
 
 
 def test4():
-    df = pd.read_csv(r"nba.csv")
+    df = pd.read_csv(r"data/nba.csv")
     columns = df.columns
     # read each column
     # col_by_name = df['Team']

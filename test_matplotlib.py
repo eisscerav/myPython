@@ -39,6 +39,26 @@ def demo2():
     plt.show()
 
 
+def demo3():
+    gas = pd.read_csv(r'data/gas_prices.csv')
+    pd_year = gas.Year
+    plt.title(r'Gas Prices')
+    countries_to_look_at = ['Australia', 'France', 'UK']
+    # plt.plot(pd_year, gas.USA, 'b.-')
+    # plt.plot(pd_year, gas.USA, label='United Stats', marker='b.-')
+    # plt.plot(pd_year, gas['South Korea'])
+    for country in gas:
+        # if country != 'Year':
+        if country in countries_to_look_at:
+            plt.plot(pd_year, gas[country], marker='.')
+    plt.xticks(gas.Year[::2])
+    plt.xlabel('Year')
+    plt.legend()
+    plt.show()
+    print(gas)
+
+
 if __name__ == '__main__':
-    demo()
+    # demo()
     # demo2()
+    demo3()
