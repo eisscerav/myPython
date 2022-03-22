@@ -15,7 +15,7 @@ def demo():
     # Line number 2
     x2 = np.arange(0, 4.5, 0.5)  # select interval we want to plot points at
 
-    plt.plot(x2[:5], x2[:5]**2)  # plot part of graph
+    plt.plot(x2[:5], x2[:5]**2, label='x^2')  # plot part of graph
     plt.plot(x2[4:], x2[4:]**2, linestyle=':')  # plot remainder of graph
 
     fontdict = {'fontsize': 40, 'fontname': 'Comic Sans MS'}
@@ -40,5 +40,5 @@ def demo2():
 
 
 if __name__ == '__main__':
-    # demo()
-    demo2()
+    demo()
+    # demo2()
