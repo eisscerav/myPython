@@ -65,9 +65,40 @@ def demo():
     print(response)
 
 
+def get_cudnn_package():
+    base_url = r'http://scdvstransfer.nvidia.com'
+    url = r'http://scdvstransfer.nvidia.com/dvsshare/vol2/cudnn_dev_gpgpu_cuda_a_Release_Linux_Ubuntu20_04_AMD64_CUDNN_TESTS/'
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'lxml')
+    links = soup.find_all('a')
+    pkgs = []
+    for link in links:
+        if link.get('href').endswith('TESTS.tgz'):
+            pkgs.append(link.get('href'))
+    latest_pkg = pkgs[-1]
+    filename = latest_pkg.split(r'/')[-1]
+    local_files = os.listdir()
+    need_to_download = False
+    for local_file in local_files:
+        if local_file not in latest_pkg:
+            need_to_download = True
+            break
+    if need_to_download:
+        down_link = '{}{}'.format(base_url, latest_pkg)
+        print('Download pkg link : {}'.format(down_link))
+        cmd = r'axel {} -o {}'.format(latest_pkg, filename)
+        print(cmd)
+        with requests.get(down_link) as r:
+            with open(filename, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=4096):
+                    f.write(chunk)
+        print('Done download')
+
+
 if __name__ == '__main__':
     url = r'http://dvstransfer.nvidia.com/dvsshare/dvs-binaries/gpu_drv_cuda_a_Release_Linux_AMD64_GPGPU_COMPILER/SW_31051952.0_gpu_drv_cuda_a_Release_Linux_AMD64_GPGPU_COMPILER.tgz'
     # download_file(url=url)
     # timer(func=download_file, arg1=url)
-    demo()
+    # demo()
+    get_cudnn_package()
 

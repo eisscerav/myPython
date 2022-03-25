@@ -25,7 +25,7 @@ def demo():
     plt.xticks(x)  # adjust unit of x axis
     plt.yticks(y)
     plt.legend()
-    plt.savefig('first_fig.png')  # save image
+    plt.savefig('first_fig.png', dpi=200)  # save image
     plt.show()
 
 
@@ -39,6 +39,7 @@ def demo2():
     plt.show()
 
 
+# deal data gas_prices with pandas
 def demo3():
     gas = pd.read_csv(r'data/gas_prices.csv')
     pd_year = gas.Year
@@ -52,13 +53,51 @@ def demo3():
         if country in countries_to_look_at:
             plt.plot(pd_year, gas[country], marker='.')
     plt.xticks(gas.Year[::2])
+    # add more years in x axis by plt.xticks(gas.Year[::2].tolist()+[2012])
     plt.xlabel('Year')
     plt.legend()
     plt.show()
     print(gas)
 
 
+# fifa data
+def demo_hist():
+    bins = [20, 40, 60, 80, 100]
+    fifa = pd.read_csv('data/fifa_data.csv')
+    overall = fifa.Overall
+    plt.hist(overall, color='g')
+    # plt.hist(overall, bins=bins)
+    # plt.xticks(bins)
+    plt.ylabel('number of players')
+    plt.xlabel('skills')
+    plt.show()
+
+
+def demo_pie():
+    fifa = pd.read_csv('data/fifa_data.csv')
+    left = fifa.loc[fifa['Preferred Foot'] == 'Left'].count()[0]
+    right = fifa.loc[fifa['Preferred Foot'] == 'Right'].count()[0]
+    labels = ['left', 'right']
+    colors = ['g', 'b']
+    plt.pie([left, right], labels=labels, colors=colors, autopct='%.2f')
+    plt.show()
+
+
+def demo_boxplot():
+    fifa = pd.read_csv('data/fifa_data.csv')
+    print(fifa)
+    barcelona = fifa.loc[fifa.Club == 'FC Barcelona']['Overall']
+    chelsea = fifa.loc[fifa.Club == 'Chelsea']['Overall']
+    labels = ['FC Barcelona', 'chelsea']
+    plt.boxplot([barcelona, chelsea], labels=labels)
+    plt.show()
+
+
 if __name__ == '__main__':
+    # todo: try plt.style.use, plt.style.available
     # demo()
     # demo2()
-    demo3()
+    # demo3()
+    # demo_hist()
+    # demo_pie()
+    demo_boxplot()

@@ -18,6 +18,7 @@ def demo1():
     cwd = os.getcwd()
     os.chdir('/home')
     os.chdir(cwd)
+    files = os.listdir()
     print(cmd1)
 
 

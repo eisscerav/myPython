@@ -61,7 +61,7 @@ def demo():
     print("Done")
 
 
-def demo1():
+def demo_search_tree():
     # Multi-valued attributes
     css_soup = BeautifulSoup('<p class="body strikeout"></p>')
     # cls = css_soup.p['class']
@@ -129,7 +129,7 @@ def demo1():
     print(rel_soup.p)
 
 
-def demo2():
+def demo_update_tags():
     # https://beautiful-soup-4.readthedocs.io/en/latest/#modifying-the-tree
     soup = BeautifulSoup('<b class="boldest">Extremely bold</b>')
     tag = soup.b
@@ -208,4 +208,7 @@ def demo2():
 
 
 if __name__ == '__main__':
-    demo2()
+    QuickStart()
+    # demo2()
+
+
