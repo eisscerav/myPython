@@ -67,8 +67,8 @@ def demo():
 
 def get_cudnn_package():
     base_url = r'http://scdvstransfer.nvidia.com'
-    url = r'http://scdvstransfer.nvidia.com/dvsshare/vol2/cudnn_dev_gpgpu_cuda_a_Release_Linux_Ubuntu20_04_AMD64_CUDNN_TESTS/'
-    response = requests.get(url)
+    cudnn_pkg_url = r'http://scdvstransfer.nvidia.com/dvsshare/vol2/cudnn_dev_gpgpu_cuda_a_Release_Linux_Ubuntu20_04_AMD64_CUDNN_TESTS/'
+    response = requests.get(cudnn_pkg_url)
     soup = BeautifulSoup(response.text, 'lxml')
     links = soup.find_all('a')
     pkgs = []
@@ -78,11 +78,13 @@ def get_cudnn_package():
     latest_pkg = pkgs[-1]
     filename = latest_pkg.split(r'/')[-1]
     local_files = os.listdir()
-    need_to_download = False
+    local_pkgs = []
+    need_to_download = True
     for local_file in local_files:
-        if local_file not in latest_pkg:
-            need_to_download = True
-            break
+        if local_file.endswith('tgz'):
+            local_pkgs.append(local_file)
+        if local_file in latest_pkg:
+            need_to_download = False
     if need_to_download:
         down_link = '{}{}'.format(base_url, latest_pkg)
         print('Download pkg link : {}'.format(down_link))
@@ -93,6 +95,11 @@ def get_cudnn_package():
                 for chunk in r.iter_content(chunk_size=4096):
                     f.write(chunk)
         print('Done download')
+        if local_pkgs:
+            for pkg in local_pkgs:
+                os.remove(pkg)
+    else:
+        print('No need to download cudnn packages from server\n')
 
 
 if __name__ == '__main__':

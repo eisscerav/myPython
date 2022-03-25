@@ -18,9 +18,17 @@ def demo1():
     cwd = os.getcwd()
     os.chdir('/home')
     os.chdir(cwd)
-    files = os.listdir()
     print(cmd1)
 
+    files = os.listdir()
+    pkgs = []
+    for file in files:
+        if file.endswith('tgz'):
+           pkgs.append(file)
+    pkgs.remove('SW_31121986.0_cudnn_dev_gpgpu_cuda_a_Release_Linux_Ubuntu20_04_AMD64_CUDNN_TESTS.tgz')
+    for pkg in pkgs:
+        os.remove(pkg)
+    print(pkgs)
 
 if __name__ == '__main__':
     demo1()
