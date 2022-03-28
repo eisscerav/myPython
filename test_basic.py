@@ -1,7 +1,18 @@
 import os
 
 
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+
 def demo():
+    try:
+        os.mkdir('/home/fanxin/tmp')
+    except Exception as e:
+        pass
+    os.chdir('/home/test/cudnn_pkg')
     div = ['a', 'b', 'c', 'd']
     for i, ele in enumerate(div):
         print(ele, i)
@@ -30,5 +41,20 @@ def demo1():
         os.remove(pkg)
     print(pkgs)
 
+
+def demo_class():
+    p = Person('fancy', 40)
+    print(p.name, p.age)
+
+
+def demo_file_op():
+    with open('tmp.txt', 'r') as f:
+        for each in f:
+            print(each)
+
+
 if __name__ == '__main__':
+    demo()
     demo1()
+    demo_class()
+    # demo_file_op()

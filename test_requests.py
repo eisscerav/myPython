@@ -65,7 +65,15 @@ def demo():
     print(response)
 
 
+# todo: make get_cudnn_package reusable by adding parameters
 def get_cudnn_package():
+    homedir = os.path.expanduser(r'~')
+    workdir = os.path.join(homedir, 'cudnn_pkg')
+    try:
+        os.mkdir(workdir)
+    except Exception as e:
+        print(e.strerror)
+    os.chdir(workdir)
     base_url = r'http://scdvstransfer.nvidia.com'
     cudnn_pkg_url = r'http://scdvstransfer.nvidia.com/dvsshare/vol2/cudnn_dev_gpgpu_cuda_a_Release_Linux_Ubuntu20_04_AMD64_CUDNN_TESTS/'
     response = requests.get(cudnn_pkg_url)
@@ -83,13 +91,13 @@ def get_cudnn_package():
     for local_file in local_files:
         if local_file.endswith('tgz'):
             local_pkgs.append(local_file)
-        if local_file in latest_pkg:
+        if local_file == filename:
             need_to_download = False
     if need_to_download:
         down_link = '{}{}'.format(base_url, latest_pkg)
         print('Download pkg link : {}'.format(down_link))
         cmd = r'axel {} -o {}'.format(latest_pkg, filename)
-        print(cmd)
+        # print(cmd)
         with requests.get(down_link) as r:
             with open(filename, 'wb') as f:
                 for chunk in r.iter_content(chunk_size=4096):

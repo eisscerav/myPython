@@ -4,17 +4,17 @@ import os
 
 
 def post_msg(channel, msg):
-  # todo: may configure token as env variable and use os.environ['SLACK_TOKEN']
-  token = 'replace_with_your_token'
-  client = slack.WebClient(token)
-  try:
-    response = client.chat_postMessage(
-      channel=channel,
-      text=msg
-    )
-    print(response)
-  except slack.errors.SlackApiError as e:
-    print(e)
+    # todo: may configure token as env variable and use os.environ['SLACK_TOKEN']
+    token = 'replace_with_your_token'
+    client = slack.WebClient(token)
+    try:
+      response = client.chat_postMessage(
+        channel=channel,
+        text=msg
+      )
+      print(response)
+    except slack.errors.SlackApiError as e:
+      print(e)
 
 post_msg("#my-bot", ":joy: :ox:")
 
