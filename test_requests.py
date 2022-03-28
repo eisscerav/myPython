@@ -84,22 +84,22 @@ def get_cudnn_package():
         if link.get('href').endswith('TESTS.tgz'):
             pkgs.append(link.get('href'))
     latest_pkg = pkgs[-1]
-    filename = latest_pkg.split(r'/')[-1]
+    file_name = latest_pkg.split(r'/')[-1]
     local_files = os.listdir()
     local_pkgs = []
     need_to_download = True
     for local_file in local_files:
         if local_file.endswith('tgz'):
             local_pkgs.append(local_file)
-        if local_file == filename:
+        if local_file == file_name:
             need_to_download = False
     if need_to_download:
         down_link = '{}{}'.format(base_url, latest_pkg)
         print('Download pkg link : {}'.format(down_link))
-        cmd = r'axel {} -o {}'.format(latest_pkg, filename)
+        cmd = r'axel {} -o {}'.format(latest_pkg, file_name)
         # print(cmd)
         with requests.get(down_link) as r:
-            with open(filename, 'wb') as f:
+            with open(file_name, 'wb') as f:
                 for chunk in r.iter_content(chunk_size=4096):
                     f.write(chunk)
         print('Done download')
