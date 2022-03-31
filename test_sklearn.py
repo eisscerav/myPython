@@ -34,6 +34,8 @@ def demo_cls_nlp():
     train_y = [x.sentiment for x in train]
     test_x = [x.text for x in test]
     test_y = [x.sentiment for x in test]
+    # todo: Try TfidVectorizer compared to CountVectorizer
+    # from sklearn.feature_extraction.text import TfidfVectorizer
     vectorizer = CountVectorizer()
     # train_x_vector = vectorizer.fit_transform(train_x)  # sparse matrix
     vectorizer.fit(train_x)
@@ -73,7 +75,29 @@ def demo_cls_nlp():
     log_score = clf_log.score(test_x_vector, test_y)
 
     # F1 score
+    from sklearn.metrics import f1_score
+    f1_s = f1_score(test_y, clf_svm.predict(test_x_vector), average=None,
+                    labels=['POSITIVE', 'NEUTRAL', 'NEGATIVE'])
 
+    # Tuning model with grid search
+    from sklearn.model_selection import GridSearchCV
+    params = {
+        'kernel': ('linear', 'rbf'),
+        'C': (2, 4, 6, 8, 32)
+    }
+    svc = svm.SVC()
+    clf_svm_cv = GridSearchCV(svc, params, cv=3)
+    clf_svm_cv.fit(train_x_vector, train_y)
+
+    # Saving model
+    import pickle
+    with open('my_clf.pickle', 'wb') as f:
+        pickle.dump(clf_svm_cv, f)
+
+    # Loading model
+    with open('my_clf.pickle', 'rb') as f:
+        load_clf = pickle.load(f)
+    print(load_clf.predict(test_x_vector[10]))
     print(data)
 
 
