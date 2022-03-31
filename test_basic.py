@@ -1,10 +1,15 @@
 import os
+import re
+import pandas as pd
 
 
 class Person:
     def __init__(self, name, age):
         self.name = name
         self.age = age
+
+    def get_name(self):
+        return self.name
 
 
 def demo():
@@ -53,8 +58,43 @@ def demo_file_op():
             print(each)
 
 
+def demo_chinese():
+    p = re.compile(r'\(.*\)')
+    a = ['高手', '低手', 'aaa ed (快手)']
+    o = a[-1]
+    t = p.sub('', o)
+    if '快' in a:
+        print('yes')
+
+
+def parse_offline():
+    root = r'D:\VM_shared'
+    my = open(os.path.join(root, 'my.txt'), 'r')
+    other = open(os.path.join(root, 'other.txt'), 'r')
+    my_list = []
+    other_list = []
+    for each in my:
+        my_list.append(each.strip())
+    for each in other:
+        other_list.append(each.strip())
+
+    for each_other in other_list:
+        if each_other in my_list:
+            print('{} yes'.format(each_other.strip()))
+        else:
+            print('{} no'.format(each_other.strip()))
+    # for line in csv_file:
+    #     print(line)
+        # my_list.append(p.sub('', line.strip()))
+    # print(my_list[10])
+    my.close()
+    other.close()
+
+
 if __name__ == '__main__':
-    demo()
-    demo1()
-    demo_class()
+    # demo()
+    # demo1()
+    # demo_class()
     # demo_file_op()
+    # demo_chinese()
+    parse_offline()
