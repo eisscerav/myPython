@@ -8,6 +8,8 @@ class Person:
 
 
 def demo():
+    str_ = '高 手 大 人'
+    s = str_.replace(r' ', '')
     try:
         os.mkdir('/home/fanxin/tmp')
     except Exception as e:
@@ -53,8 +55,34 @@ def demo_file_op():
             print(each)
 
 
+def parse_offline_program():
+    root = r'D:\VM_shared'
+    my = open(os.path.join(root, 'my.txt'), 'r')
+    other = open(os.path.join(root, 'other.txt'), 'r')
+
+    my_list = []
+    other_list = []
+    for each in my:
+        my_list.append(each.replace(' ', '').strip())
+    for each in other:
+        other_list.append(each.replace(' ', '').strip())
+
+    for each_other in other_list:
+        if each_other in my_list:
+            print('{}\tyes'.format(each_other.strip()))
+        else:
+            print('{}\tno'.format(each_other.strip()))
+    # for line in csv_file:
+    #     print(line)
+        # my_list.append(p.sub('', line.strip()))
+    # print(my_list[10])
+    my.close()
+    other.close()
+
+
 if __name__ == '__main__':
-    demo()
-    demo1()
-    demo_class()
+    # demo()
+    # demo1()
+    # demo_class()
     # demo_file_op()
+    parse_offline_program()
