@@ -60,7 +60,6 @@ def demo_file_op():
             print(each)
 
 
-<<<<<<< HEAD
 def parse_offline_program():
     root = r'D:\VM_shared'
     my = open(os.path.join(root, 'my.txt'), 'r')
@@ -78,7 +77,8 @@ def parse_offline_program():
             print('{}\tyes'.format(each_other.strip()))
         else:
             print('{}\tno'.format(each_other.strip()))
-=======
+
+
 def demo_chinese():
     p = re.compile(r'\(.*\)')
     a = ['高手', '低手', 'aaa ed (快手)']
@@ -104,7 +104,6 @@ def parse_offline():
             print('{} yes'.format(each_other.strip()))
         else:
             print('{} no'.format(each_other.strip()))
->>>>>>> 8e44c79c71f9c1ff6a1dd029e98b0444e3fd6333
     # for line in csv_file:
     #     print(line)
         # my_list.append(p.sub('', line.strip()))
@@ -118,9 +117,5 @@ if __name__ == '__main__':
     # demo1()
     # demo_class()
     # demo_file_op()
-<<<<<<< HEAD
     parse_offline_program()
-=======
     # demo_chinese()
-    parse_offline()
->>>>>>> 8e44c79c71f9c1ff6a1dd029e98b0444e3fd6333
