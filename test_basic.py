@@ -19,7 +19,6 @@ def demo():
         os.mkdir('/home/fanxin/tmp')
     except Exception as e:
         pass
-    os.chdir('/home/test/cudnn_pkg')
     div = ['a', 'b', 'c', 'd']
     for i, ele in enumerate(div):
         print(ele, i)
@@ -27,6 +26,20 @@ def demo():
     # list all env variables
     for k, v in sorted(os.environ.items()):
         print(k + ':', v)
+
+    def is_odd(n):
+        return n % 2 == 1
+    odd = list(filter(is_odd, [1, 2, 4, 5, 6, 9, 10, 15]))
+    odd_ = list(filter(lambda x: x % 2 == 1, [1, 2, 4, 5, 6, 9, 10, 15]))
+    from functools import reduce
+    li = [11, 22, 33]
+    result = reduce(lambda a, b: a + b, li)
+    li = [11, 22, 33]
+    sl = [1, 2, 3]
+    new_list = map(lambda a, b: a + b, li, sl)
+
+    l1 = list(map(lambda x: x.capitalize(), ['adam', 'LISA', 'barT']))
+    print('demo')
 
 
 def demo1():
@@ -113,7 +126,7 @@ def parse_offline():
 
 
 if __name__ == '__main__':
-    # demo()
+    demo()
     # demo1()
     # demo_class()
     # demo_file_op()

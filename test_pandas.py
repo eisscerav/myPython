@@ -4,6 +4,15 @@ import re
 import os
 
 
+def demo():
+    df = pd.read_csv(r'my.txt')
+    cols = df.columns
+    name = df.name.tolist()
+    age = df.age.tolist()
+
+    print(df.head())
+
+
 def test1():
     lst1 = [
     "作死高手",
@@ -55,6 +64,7 @@ def test4():
     # col_by_name = df['Team']
     #  try df.Team to read column Team
     col_by_name = df.Name
+    name = col_by_name.tolist()
     col1 = df['Name'][1:5]
     # read multiple columns
     col2 = df[['Name', 'Team', 'Age']]
@@ -116,4 +126,6 @@ def test4():
 
 
 if __name__ == "__main__":
+    # test2()
+    demo()
     test4()
