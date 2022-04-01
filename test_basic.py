@@ -101,30 +101,6 @@ def demo_chinese():
         print('yes')
 
 
-def parse_offline():
-    root = r'D:\VM_shared'
-    my = open(os.path.join(root, 'my.txt'), 'r')
-    other = open(os.path.join(root, 'other.txt'), 'r')
-    my_list = []
-    other_list = []
-    for each in my:
-        my_list.append(each.strip())
-    for each in other:
-        other_list.append(each.strip())
-
-    for each_other in other_list:
-        if each_other in my_list:
-            print('{} yes'.format(each_other.strip()))
-        else:
-            print('{} no'.format(each_other.strip()))
-    # for line in csv_file:
-    #     print(line)
-        # my_list.append(p.sub('', line.strip()))
-    # print(my_list[10])
-    my.close()
-    other.close()
-
-
 if __name__ == '__main__':
     demo()
     # demo1()
