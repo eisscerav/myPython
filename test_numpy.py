@@ -3,6 +3,7 @@ import numpy as np
 
 def demo1():
     # basic
+    aa = np.ndarray(shape=(2,3,4))
     a = np.array([[1, 2, 3, 4, 5],
                   [6, 7, 8, 9, 10]], dtype='int16')
     dim = a.ndim
@@ -25,7 +26,8 @@ def demo1():
     a3 = np.full((2, 3), 99)
     # np.full(a1.shape, 88)
     a4 = np.full_like(a1, 88, dtype='int')
-    a5 = np.random.rand(5, 4, 3)
+    a5 = np.random.rand(5, 10, 8)
+    a5_ = a5[:2, 2:7, 1:5]
     a6 = np.random.sample(a1.shape)
     a7 = np.random.randint(0, 10, size=(3, 3))
     a8 = np.identity(5)
