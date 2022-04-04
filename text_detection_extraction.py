@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import cv2
 import pytesseract
+from unidecode import unidecode
 
 
 def show_img(img):
@@ -9,9 +10,13 @@ def show_img(img):
 
 
 def demo():
+    chi_list = ["机器人"]
+    tessdata_dir_config = '--tessdata-dir "/home/fanxin/github/tessdata"'
+    langs = pytesseract.get_languages(config=tessdata_dir_config)
     # refer https://www.geeksforgeeks.org/text-detection-and-extraction-using-opencv-and-ocr/
-    img = cv2.imread(r'data/sample.jpg')
-    # show_img(img)
+    # img = cv2.imread(r'data/sample.jpg')
+    img = cv2.imread(r'data/eng.png')
+    show_img(img)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # show_img(gray)
     ret, thresh1 = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV)
@@ -27,7 +32,8 @@ def demo():
         x, y, w, h = cv2.boundingRect(cnt)
 
         # Drawing a rectangle on copied image
-        rect = cv2.rectangle(im2, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        # rect = cv2.rectangle(im2, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        rect = cv2.rectangle(im2, (x, y), (x + w, y + h), (255, 0, 0), 5)
 
         # Cropping the text block for giving input to OCR
         cropped = im2[y:y + h, x:x + w]
@@ -37,6 +43,7 @@ def demo():
 
         # Apply OCR on the cropped image
         text = pytesseract.image_to_string(cropped)
+        # text = unidecode(pytesseract.image_to_string(cropped, config=tessdata_dir_config, lang='chi_sim'))
         print(text)
         # Appending the text into file
         # file.write(text)
@@ -44,6 +51,8 @@ def demo():
 
         # Close the file
         # file.close()
+    show_img(im2)
+    print('demo done')
 
 
 def main():
