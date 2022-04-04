@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import cv2
+from cv2 import cv2
 import pytesseract
 from unidecode import unidecode
 
@@ -10,7 +10,6 @@ def show_img(img):
 
 
 def demo():
-    chi_list = ["机器人"]
     tessdata_dir_config = '--tessdata-dir "/home/fanxin/github/tessdata"'
     langs = pytesseract.get_languages(config=tessdata_dir_config)
     # refer https://www.geeksforgeeks.org/text-detection-and-extraction-using-opencv-and-ocr/
@@ -42,8 +41,8 @@ def demo():
         # file = open("recognized.txt", "a")
 
         # Apply OCR on the cropped image
-        text = pytesseract.image_to_string(cropped)
-        # text = unidecode(pytesseract.image_to_string(cropped, config=tessdata_dir_config, lang='chi_sim'))
+        # text = pytesseract.image_to_string(cropped)
+        text = unidecode(pytesseract.image_to_string(cropped, config=tessdata_dir_config, lang='chi_smi+eng'))
         print(text)
         # Appending the text into file
         # file.write(text)
