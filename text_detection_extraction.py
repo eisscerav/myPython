@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 from cv2 import cv2
 import pytesseract
-from unidecode import unidecode
 
 
 def show_img(img):
@@ -10,11 +9,16 @@ def show_img(img):
 
 
 def demo():
-    tessdata_dir_config = '--tessdata-dir "/home/fanxin/github/tessdata"'
+    tessdata_dir_config = ''
+    import sys
+    if sys.platform == 'win32':
+        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+    else:
+        tessdata_dir_config = '--tessdata-dir "/home/fanxin/github/tessdata"'
     langs = pytesseract.get_languages(config=tessdata_dir_config)
     # refer https://www.geeksforgeeks.org/text-detection-and-extraction-using-opencv-and-ocr/
     # img = cv2.imread(r'data/sample.jpg')
-    img = cv2.imread(r'data/eng.png')
+    img = cv2.imread(r'data/my.png')
     show_img(img)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # show_img(gray)
@@ -42,7 +46,7 @@ def demo():
 
         # Apply OCR on the cropped image
         # text = pytesseract.image_to_string(cropped)
-        text = unidecode(pytesseract.image_to_string(cropped, config=tessdata_dir_config, lang='chi_smi+eng'))
+        text = pytesseract.image_to_string(cropped, lang='chi_sim', config=tessdata_dir_config)
         print(text)
         # Appending the text into file
         # file.write(text)
