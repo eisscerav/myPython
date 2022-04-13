@@ -68,9 +68,18 @@ def demo_class():
 
 
 def demo_file_op():
-    with open('tmp.txt', 'r') as f:
-        for each in f:
-            print(each)
+    # read from a file
+    # with open('tmp.txt', 'r') as f:
+    #     for each in f:
+    #         print(each)
+    # write to a file
+    try:
+        os.mkdir('tmp')
+    except Exception as e:
+        print(e)
+    with open('tmp/tmp1.txt', 'w') as fp:
+        fp.write('fanny')
+        fp.write('philip')
 
 
 def parse_offline_program():
@@ -101,10 +110,14 @@ def demo_chinese():
         print('yes')
 
 
-if __name__ == '__main__':
-    demo()
+def main():
+    # demo()
     # demo1()
     # demo_class()
-    # demo_file_op()
-    parse_offline_program()
+    demo_file_op()
+    # parse_offline_program()
     # demo_chinese()
+
+
+if __name__ == '__main__':
+    main()

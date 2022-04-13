@@ -66,7 +66,7 @@ def demo():
 
 
 # todo: make get_cudnn_package reusable by adding parameters
-def get_cudnn_package():
+def get_cudnn_package(pkg_url=r'http://scdvstransfer.nvidia.com/dvsshare/vol2/cudnn_dev_gpgpu_cuda_a_Release_Linux_Ubuntu20_04_AMD64_CUDNN_TESTS/'):
     homedir = os.path.expanduser(r'~')
     workdir = os.path.join(homedir, 'cudnn_pkg')
     try:
@@ -75,13 +75,13 @@ def get_cudnn_package():
         print(e.strerror)
     os.chdir(workdir)
     base_url = r'http://scdvstransfer.nvidia.com'
-    cudnn_pkg_url = r'http://scdvstransfer.nvidia.com/dvsshare/vol2/cudnn_dev_gpgpu_cuda_a_Release_Linux_Ubuntu20_04_AMD64_CUDNN_TESTS/'
-    response = requests.get(cudnn_pkg_url)
+    # cudnn_pkg_url = r'http://scdvstransfer.nvidia.com/dvsshare/vol2/cudnn_dev_gpgpu_cuda_a_Release_Linux_Ubuntu20_04_AMD64_CUDNN_TESTS/'
+    response = requests.get(pkg_url)
     soup = BeautifulSoup(response.text, 'lxml')
     links = soup.find_all('a')
     pkgs = []
     for link in links:
-        if link.get('href').endswith('TESTS.tgz'):
+        if link.get('href').endswith('TESTS.tgz'):  # todo: in case package is failure
             pkgs.append(link.get('href'))
     latest_pkg = pkgs[-1]
     file_name = latest_pkg.split(r'/')[-1]
@@ -96,7 +96,7 @@ def get_cudnn_package():
     if need_to_download:
         down_link = '{}{}'.format(base_url, latest_pkg)
         print('Download pkg link : {}'.format(down_link))
-        cmd = r'axel {} -o {}'.format(latest_pkg, file_name)
+        cmd = r'axel {} -o {}'.format(latest_pkg, file_name)  # accelerate download
         # print(cmd)
         with requests.get(down_link) as r:
             with open(file_name, 'wb') as f:
@@ -110,10 +110,30 @@ def get_cudnn_package():
         print('No need to download cudnn packages from server\n')
 
 
-if __name__ == '__main__':
-    url = r'http://dvstransfer.nvidia.com/dvsshare/dvs-binaries/gpu_drv_cuda_a_Release_Linux_AMD64_GPGPU_COMPILER/SW_31051952.0_gpu_drv_cuda_a_Release_Linux_AMD64_GPGPU_COMPILER.tgz'
+def get_test_result(file_name=''):
+    user = 'ffan'
+    password = 'd0N3Pci9d0N3Pci9'
+    url = r'http://scvrlweb.nvidia.com/list_result_files.php?job=8688253'
+    file_name = r'test_results.log'
+    test_results = '{}/{}'.format(url, file_name)
+    response = requests.get(url, auth=(user, password))
+    soup = BeautifulSoup(response.text, 'lxml')
+    all_links = soup.find_all('a')
+    for link in all_links:
+        if link.text == file_name:
+            print(test_results)
+
+    print('done req_non_exist')
+
+
+def main():
     # download_file(url=url)
     # timer(func=download_file, arg1=url)
     # demo()
-    get_cudnn_package()
+    # get_cudnn_package()
+    get_test_result()
+
+
+if __name__ == '__main__':
+    main()
 

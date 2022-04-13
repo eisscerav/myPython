@@ -2,9 +2,7 @@ from bs4 import BeautifulSoup
 import bs4
 import re
 
-
 # refer to https://beautiful-soup-4.readthedocs.io/en/latest/
-
 html_doc = """
 <html><head><title>The Dormouse's story</title></head>
 <body>
@@ -23,9 +21,7 @@ and they lived at the bottom of a well.</p>
 # soup = BeautifulSoup(open("index.html"))
 # soup = BeautifulSoup("<html>data</html>")
 ###################################################
-
-
-def QuickStart():
+def quick_start():
     soup = BeautifulSoup(html_doc, 'lxml')
     title = soup.title
     title_name = soup.title.name
@@ -36,6 +32,7 @@ def QuickStart():
     id_link3 = soup.find(id="link3")
 
     for link in soup.find_all('a'):
+        ref = link.get('href')
         print(link.get('href'))
 
     text = soup.get_text()
@@ -207,8 +204,14 @@ def demo_update_tags():
     print(soup.prettify())
 
 
-if __name__ == '__main__':
-    QuickStart()
+def main():
+    # demo()
+    quick_start()
+    demo_search_tree()
     # demo2()
+
+
+if __name__ == '__main__':
+    main()
 
 
