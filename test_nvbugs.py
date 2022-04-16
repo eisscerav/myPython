@@ -1,10 +1,11 @@
 import requests
 from requests.auth import HTTPBasicAuth
 import json
+import os
 
 # user = r'nvidia.com\ffan'  # Your Nvidia NTAccount
 user = r'ffan'  # Your Nvidia NTAccount
-password = ""  # Your Nvidia Password
+password = os.environ.get('NVPASSWORD')  # Your Nvidia Password
 
 
 class CudnnBug:
@@ -20,6 +21,7 @@ class CudnnBug:
 
 
 def get_bug(bug_id=3470737):
+    bug_id = 3542339
     url = "https://nvbugsapi.nvidia.com/nvbugswebserviceapi/api/bug/getbug/{}".format(bug_id)
     response = requests.get(url, auth=HTTPBasicAuth(user, password))
     content = response.content
@@ -35,7 +37,7 @@ def get_bug(bug_id=3470737):
     reqDate = bug_detail.get('RequestDate')
     # description = data['ReturnValue']['DescriptionPlainTextReadOnly'] # todo use dict.get()
     # invalid_data = data.get('noneExist')
-    bug_description = data.get('ReturnValue').get('DescriptionPlainTextReadOnly')
+    bug_description = data.get('ReturnValue').get('Description')
 
     # read string one by one line
     for each in bug_description.splitlines():
@@ -90,11 +92,9 @@ def get_nvbugs():
     #     bug_ids.append(bug.get("BugId"))
     # todo: We have bug ids and then can handle bug by getBug web api one by one to get more details
     #  (eg,. bug description and comments)
-    totalCount = toJson.get("TotalCount")
-
-    print("TotalCount = ", totalCount)
+    return bug_id
 
 
 if __name__ == '__main__':
-    # get_bug()
+    get_bug()
     get_nvbugs()

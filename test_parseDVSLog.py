@@ -6,9 +6,22 @@ import glob
 import argparse
 import shutil
 import pandas as pd
+import json
 
 user = 'ffan'
-password = ''
+password = os.environ.get('NVPASSWORD')
+
+
+class CudnnBug:
+    def __init__(self, bug_id=-1):
+        self.bug_id = bug_id
+        self.failing_cmd = []
+
+    def set_bug_id(self, bug_id):
+        self.bug_id = bug_id
+
+    def add_failing_cmd(self, cmd):
+        self.failing_cmd.append(cmd)
 
 
 class Config:
@@ -19,11 +32,8 @@ class Config:
         self.cpu = cpu
         self.gpu = gpu
         self.test_suite = test_suite
-        self.existing_bug_id = -1
         self.link = link
 
-    def set_bug_id(self, bug_id):
-        self.existing_bug_id = bug_id
 
 
 class TestResult:
@@ -31,13 +41,75 @@ class TestResult:
         self.cudnn_cmd = cmd
         self.fist_error = fist_err
         self.layer = layer
+        self.existing_bug_id = -1
+
+    def set_bug_id(self, bug_id):
+        self.existing_bug_id = bug_id
 
     def print_format(self):
         print(r'='*100)
 
 
+def get_bug(bug_id=3470737):
+    url = "https://nvbugsapi.nvidia.com/nvbugswebserviceapi/api/bug/getbug/{}".format(bug_id)
+    response = requests.get(url, auth=(user, password))
+    if response.status_code >=200 and response.status_code < 300:
+        data = json.loads(response.text)
+        bug_detail = data.get('ReturnValue')
+        comments = bug_detail.get('Comments')
+        cudnn_bug = CudnnBug(bug_id)
+        bug_description = data.get('ReturnValue').get('Description')
+
+        # read string one by one line
+        for each in bug_description.splitlines():
+            if "cudnnTest" in each:
+                cudnn_bug.add_failing_cmd(each.strip())
+        for comment in comments:
+            texts = comment.get('CommentText').splitlines()
+            for text in texts:
+                if 'cudnnTest' in text:
+                    cudnn_bug.add_failing_cmd(text.strip())
+        return cudnn_bug
+    else:
+        print(f'Fail to visit bug {bug_id}, status_code={response.status_code}')
+
+
 def query_cudnn_bugs():
-    pass
+    # todo: make more reusable
+    # refer https://confluence.nvidia.com/display/NVBUG/GetBugs+API
+    url = r"https://nvbugsapi.nvidia.com/NVBugsWebServiceApi/api/Search/GetBugs?page=1&limit=100"
+    headers = {'Content-type': 'application/json'}
+
+    data = [
+        {'FieldName': 'ModuleName', 'FieldValue': 'CUDA CUDNN'},
+        # {'FieldName': 'BugAction',  'FieldValue': 'QA - Open - Verify new bug OR QA - Open - Verify to close'},
+        {'FieldName': 'BugAction',  'FieldValue': 'Dev - Open - Blocked OR Dev - Open - To fix OR Dev - Open - To integrate OR Dev - Open - To Triage OR QA - Open - Provide more detail OR QA - Open - Request details from customer OR QA - Open - Verify new bug OR QA - Open - Verify to close'},
+    ]
+
+    payload = json.dumps(data)
+    response = requests.post(url, data=payload, auth=(user, password), headers=headers)
+    total = response.json().get('TotalCount')
+    pages = -1
+    bug_id = []
+    if total / 100:
+        pages = int(total / 100) + 1
+    else:
+        pages = total / 100
+    for i in range(pages):
+        url = r"https://nvbugsapi.nvidia.com/NVBugsWebServiceApi/api/Search/GetBugs?page={}&limit=100".format(
+            str(i + 1))
+        response = requests.post(url, data=payload, auth=(user, password), headers=headers)
+        bugs = response.json().get('ReturnValue')
+        for bug in bugs:
+            bug_id.append(bug.get('BugId'))
+    bug_id = list(set(bug_id))
+    # bugs = toJson.get("ReturnValue")
+    # bug_ids = []
+    # for idx, bug in enumerate(bugs):
+    #     bug_ids.append(bug.get("BugId"))
+    # todo: We have bug ids and then can handle bug by getBug web api one by one to get more details
+    #  (eg,. bug description and comments)
+    return bug_id
 
 
 def parse_general_log(file_name=''):
@@ -108,6 +180,13 @@ def get_test_result(job_id='8688253'):
 
 def parse_dvs_changelist(argparser, changelist='3116903139432407.0'):
     # todo: query nvbugs first and catch dup failing cases
+    cudnn_bugs = []
+    bug_ids = query_cudnn_bugs()
+    for bug_id in bug_ids:
+        print(bug_id)
+        cudnn_bug = get_bug(bug_id)
+        if cudnn_bug.failing_cmd:
+            cudnn_bugs.append(cudnn_bug)
     try:
         shutil.rmtree('tmp')
         os.mkdir('tmp')
@@ -146,9 +225,9 @@ def parse_dvs_changelist(argparser, changelist='3116903139432407.0'):
                     if 'no' not in result_file and 'CUDNN.LEVEL' in test_suite:  # to parse log in cudnnTest fashion
                     # if 1:
                         # todo: may need a refactor by using config
-                        config = Config(os_, branch, cpu, gpu, test_suite, job_link)
+                        # config = Config(os_, branch, cpu, gpu, test_suite, job_link)
                         failing_cases = parse_cudnn_test_log(result_file)
-                        # failing_cases = parse_cudnn_test_log()
+                        # failing_cases = parse_cudnn_test_log()  # for debug
                         # todo: save result into database
                         # columns = ['os', 'branch', 'cpu', 'gpu', 'test_suite', 'link', 'cmd', 'layer', 'err_msg']
                         series_os = []
@@ -160,6 +239,7 @@ def parse_dvs_changelist(argparser, changelist='3116903139432407.0'):
                         series_cmd = []
                         series_layer = []
                         series_errmsg = []
+                        series_bug_id = []
                         for fail_case in failing_cases:
                             series_os.append(os_)
                             series_branch.append(branch)
@@ -170,6 +250,15 @@ def parse_dvs_changelist(argparser, changelist='3116903139432407.0'):
                             series_cmd.append(fail_case.cudnn_cmd)
                             series_layer.append(fail_case.layer)
                             series_errmsg.append(fail_case.fist_error)
+                            for bug in cudnn_bugs:
+                                if fail_case.existing_bug_id != -1:
+                                    break
+                                for failing in bug.failing_cmd:
+                                    if fail_case.cudnn_cmd in failing:
+                                        fail_case.set_bug_id(bug.bug_id)
+                                        break
+                            series_bug_id.append(fail_case.existing_bug_id)
+                            # todo: save bug_id into dataframe
                         data = {
                             'os': series_os,
                             'branch': series_branch,
@@ -179,7 +268,8 @@ def parse_dvs_changelist(argparser, changelist='3116903139432407.0'):
                             'link': series_link,
                             'cmd': series_cmd,
                             'layer': series_layer,
-                            'error_message': series_errmsg
+                            'error_message': series_errmsg,
+                            'bug_id': series_bug_id
                         }
                         df = pd.DataFrame(data)
                         df.to_csv('tmp/{}.csv'.format(job_id), index=False)
