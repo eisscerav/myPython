@@ -112,7 +112,7 @@ def get_cudnn_package(pkg_url=r'http://scdvstransfer.nvidia.com/dvsshare/vol2/cu
 
 def get_test_result(file_name=''):
     user = 'ffan'
-    password = 'd0N3Pci9d0N3Pci9'
+    password = os.environ.get('NVPASSWORD')
     url = r'http://scvrlweb.nvidia.com/list_result_files.php?job=8688253'
     file_name = r'test_results.log'
     test_results = '{}/{}'.format(url, file_name)

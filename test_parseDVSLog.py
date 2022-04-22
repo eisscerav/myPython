@@ -35,7 +35,6 @@ class Config:
         self.link = link
 
 
-
 class TestResult:
     def __init__(self, cmd, fist_err, layer):
         self.cudnn_cmd = cmd
@@ -51,7 +50,7 @@ class TestResult:
 
 
 def get_bug(bug_id=3470737):
-    url = "https://nvbugsapi.nvidia.com/nvbugswebserviceapi/api/bug/getbug/{}".format(bug_id)
+    url = r"https://nvbugsapi.nvidia.com/nvbugswebserviceapi/api/bug/getbug/{}".format(bug_id)
     response = requests.get(url, auth=(user, password))
     if response.status_code >=200 and response.status_code < 300:
         data = json.loads(response.text)
