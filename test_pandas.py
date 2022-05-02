@@ -125,7 +125,27 @@ def test4():
     print(df.head(2))
 
 
+def cook_book():
+    import datetime
+    import numpy as np
+    # refer https://pandas.pydata.org/docs/user_guide/reshaping.html#reshaping-pivot
+    df = pd.DataFrame(
+        {
+            "A": ["one", "one", "two", "three"] * 6,
+            "B": ["A", "B", "C"] * 8,
+            "C": ["foo", "foo", "foo", "bar", "bar", "bar"] * 4,
+            "D": np.random.randn(24),
+            "E": np.random.randn(24),
+            "F": [datetime.datetime(2013, i, 1) for i in range(1, 13)]
+                 + [datetime.datetime(2013, i, 15) for i in range(1, 13)],
+        }
+    )
+    pt = pd.pivot_table(df, values="D", index=["A", "B"], columns=["C"])
+    print(pt.describe())
+
+
 if __name__ == "__main__":
     # test2()
-    demo()
-    test4()
+    # demo()
+    # test4()
+    cook_book()
