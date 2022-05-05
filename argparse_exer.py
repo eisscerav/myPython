@@ -7,9 +7,9 @@ def demo_argparse():
     parser.add_argument('--name', type=str, dest='ffan_name', metavar='meta', help='last name')
     args = parser.parse_args()
 
-    # print(args.family+args.ffan_name)
-    parser.print_help()
-    parser.print_usage()
+    print(f"args.family={args.family}, args.ffan_name={args.ffan_name}")
+    # parser.print_help()
+    # parser.print_usage()
 
 
 if __name__ == '__main__':
