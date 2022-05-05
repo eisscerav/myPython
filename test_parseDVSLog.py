@@ -52,7 +52,7 @@ class TestResult:
 def get_bug(bug_id=3470737):
     url = r"https://nvbugsapi.nvidia.com/nvbugswebserviceapi/api/bug/getbug/{}".format(bug_id)
     response = requests.get(url, auth=(user, password))
-    if response.status_code >=200 and response.status_code < 300:
+    if 200 <= response.status_code < 300:
         data = json.loads(response.text)
         bug_detail = data.get('ReturnValue')
         comments = bug_detail.get('Comments')

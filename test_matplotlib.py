@@ -9,7 +9,7 @@ def demo():
     y = [2, 4, 6, 8]
 
     # resize graph
-    plt.figure(figsize=(5, 5), dpi=100)
+    fig = plt.figure(figsize=(5, 5), dpi=100)
     plt.plot(x, y, label='2x', color='green', linewidth=3, marker='.', markersize=12, markeredgecolor='red',
              linestyle='--')
     # Line number 2
@@ -33,9 +33,15 @@ def demo2():
     # bar chart
     labels = ['fancy', 'sof', 'jenny']
     values = [40, 33, 12]
-    bars = plt.bar(labels, values)
-    bars[0].set_hatch('/')
-    bars[1].set_hatch('o')
+    fig = plt.figure()
+    # plot 2 tables into one frame with position 1 and 2 todo: try position 223 and 224
+    ax1 = fig.add_subplot(111)
+    ax1.bar(labels, values)
+    ax2 = fig.add_subplot(112)
+    ax2.bar(labels, values)
+    # bars = plt.bar(labels, values)
+    # bars[0].set_hatch('/')
+    # bars[1].set_hatch('o')
     plt.show()
 
 
@@ -96,8 +102,8 @@ def demo_boxplot():
 if __name__ == '__main__':
     # todo: try plt.style.use, plt.style.available
     # demo()
-    # demo2()
+    demo2()
     # demo3()
     # demo_hist()
     # demo_pie()
-    demo_boxplot()
+    # demo_boxplot()
