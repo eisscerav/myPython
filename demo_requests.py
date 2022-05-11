@@ -1,10 +1,10 @@
+from bs4 import BeautifulSoup
 import requests
 import shutil
 import timeit
 import time
 import os
 import threading
-from bs4 import BeautifulSoup
 
 
 def timer_func(func):
@@ -122,8 +122,48 @@ def get_test_result(file_name=''):
     for link in all_links:
         if link.text == file_name:
             print(test_results)
-
     print('done req_non_exist')
+
+
+def get_cask_bin(cuda='cuda11.7', arch='x86_64', size_type='minimal'):
+    # fixme: move to a separate function
+    homedir = os.path.expanduser(r'~')
+    workdir = os.path.join(homedir, 'cudnn_pkg')
+    try:
+        os.mkdir(workdir)
+    except Exception as e:
+        print(e.strerror)
+    os.chdir(workdir)
+    # todo: make reusable by adding parameters
+    user = 'ffan'
+    password = os.environ.get('NVPASSWORD')
+    url = r'https://urm.nvidia.com/artifactory/sw-fastkernels-generic/cicd/cask_sdk/feature_5.0_cbi_cudnn/Nightly_for_CUDNN/'
+    response = requests.get(url, auth=(user, password))
+    if 200 <= response.status_code < 300:
+        soup = BeautifulSoup(response.text, 'lxml')
+        links = soup.find_all('a')
+        links.pop(0)  # remove href '../'
+        new = 0
+        for link in links:
+            curr = int(link.get('href')[:-1])
+            if curr > new:
+                new = curr
+            # print(link.get('href'))
+        latest_cask_url = ''.join([url, str(new), r'/'])
+        response_1 = requests.get(latest_cask_url, auth=(user, password))  # fixme: check response status_code
+        soup_1 = BeautifulSoup(response_1.text, 'lxml')
+        links_1 = soup_1.find_all('a')
+        for link in links_1:
+            if cuda in link.text and arch in link.text and size_type in link.text:
+                down_link = ''.join([latest_cask_url, link.text])
+                print(f'start to download {down_link}')
+                with open('down.txt', 'w') as f:
+                    f.write(down_link)
+                with requests.get(down_link, auth=(user, password)) as r:  # fixme: check response status_code
+                    with open('cask.tar.gz', 'wb') as f:
+                        for chunk in r.iter_content(chunk_size=4096):
+                            f.write(chunk)
+    print('done get_cask_bin')
 
 
 def main():
@@ -131,7 +171,8 @@ def main():
     # timer(func=download_file, arg1=url)
     # demo()
     # get_cudnn_package()
-    get_test_result()
+    # get_test_result()
+    get_cask_bin()
 
 
 if __name__ == '__main__':

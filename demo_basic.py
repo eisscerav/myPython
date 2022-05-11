@@ -109,12 +109,23 @@ def demo_chinese():
     if '快' in a:
         print('yes')
 
+def foo(*args):
+    for arg in args:
+        print(arg)
+
+def bar(*args):
+    print(args)
+    foo(*args)
+
+def zoo():
+    bar(1, 2, 3)
 
 def main():
+    zoo()
     # demo()
     # demo1()
     # demo_class()
-    demo_file_op()
+    # demo_file_op()
     # parse_offline_program()
     # demo_chinese()
 
