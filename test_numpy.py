@@ -1,5 +1,5 @@
 import numpy as np
-
+import pandas as pd
 
 def demo1():
     # basic
@@ -67,5 +67,20 @@ def demo1():
     print(a)
 
 
+def demo2():
+    data = {
+        'A': np.random.randint(1, 2, size=10),
+        'B': np.random.randint(1, 2, size=10),
+    }
+    df = pd.DataFrame(data)
+    b_div_2 = df['B'] / 2
+    print(df.describe())
+
+
+def main():
+    # demo1()
+    demo2()
+
+
 if __name__ == '__main__':
-    demo1()
+    main()

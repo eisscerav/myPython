@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import pandas as pd
+import numpy as np
 import re
 import os
 
@@ -11,6 +12,29 @@ def demo():
     age = df.age.tolist()
 
     print(df.head())
+
+
+def demo_groupby():
+    df = pd.DataFrame(
+        [
+            ("bird", "Falconiformes", 389.0),
+            ("bird", "Psittaciformes", 24.0),
+            ("mammal", "Carnivora", 80.2),
+            ("mammal", "Primates", np.nan),
+            ("mammal", "Carnivora", 58),
+        ],
+        index=["falcon", "parrot", "lion", "monkey", "leopard"],
+        columns=("class", "order", "max_speed"),
+    )
+    desc1 = df.describe()
+
+    grouped1 = df.groupby("class")
+    desc_gp1 = grouped1.describe()
+    # grouped2 = df.groupby("order", axis="columns")
+    # desc_gp2 = grouped2.describe()
+    grouped3 = df.groupby(["class", "order"])
+    desc_gp3 = grouped3.describe()
+    print(grouped1.describe())
 
 
 def test1():
@@ -147,5 +171,6 @@ def cook_book():
 if __name__ == "__main__":
     # test2()
     # demo()
-    # test4()
-    cook_book()
+    test4()
+    # cook_book()
+    demo_groupby()

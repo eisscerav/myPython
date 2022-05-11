@@ -197,7 +197,7 @@ def parse_dvs_changelist(argparser, changelist='3116903139432407.0'):
     global password
     job_link = r'http://scdvs.nvidia.com/Regression_Results?which_changelist={}&which_category=Extended+Sanity'.format(changelist)
     response = requests.get(job_link, auth=(user, password))
-    if response.status_code >= 200 and response.status_code < 300:
+    if 200 <= response.status_code < 300:
         soup = BeautifulSoup(response.text, 'lxml')
         tables = soup.find_all('table', width="1080", border="0", cellspacing="0", cellpadding="0")
         for table in tables:
