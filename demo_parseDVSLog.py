@@ -36,14 +36,18 @@ class Config:
 
 
 class TestResult:
-    def __init__(self, cmd, fist_err, layer):
+    def __init__(self, cmd, fist_err, layer, errors):
         self.cudnn_cmd = cmd
         self.fist_error = fist_err
         self.layer = layer
         self.existing_bug_id = -1
+        self.error_list = errors
 
     def set_bug_id(self, bug_id):
         self.existing_bug_id = bug_id
+
+    def set_errors(self, errors):
+        self.error_list = errors
 
     def print_format(self):
         print(r'='*100)
@@ -127,7 +131,8 @@ def parse_cudnn_test_log(file_name=r'/home/fanxin/Downloads/cudnn_triage/test_re
     failing_cases = []  # {}
     contents = fp.readlines()
     current_case = ''
-    error_msg = ''  # []
+    first_error = ''  # []
+    errors = []
     layer = ''
     # case = ['test_name', 'error_msg', 'passed/failed']
     for idx,  text in enumerate(contents):
@@ -138,10 +143,12 @@ def parse_cudnn_test_log(file_name=r'/home/fanxin/Downloads/cudnn_triage/test_re
             g = m.group(0)
             layer = g.replace('Running test ', '').replace(':', '').strip()
         if error_sym in text and debug_sym not in text:
-            error_msg = text
+            first_error = text
+        if 'error' in text.lower() or 'fail' in text.lower():
+            errors.append(text.strip())
         if failed_sym in text and debug_sym not in text and current_case in text:
             # failing_cases[current_case] = (error_msg, layer)
-            failing_cases.append(TestResult(current_case, error_msg, layer))
+            failing_cases.append(TestResult(current_case, first_error, layer, errors))
     # for failing_case in failing_cases:
     #     print('cudnnTest: {}error message: {}layer: {}'.format
     #           (failing_case.cudnn_cmd, failing_case.fist_error, failing_case.layer))
@@ -216,6 +223,7 @@ def parse_dvs_changelist(argparser, changelist='3116903139432407.0'):
                     print('Build Failure: {test_suite}, {branch}, {OS}, {cpu}, {gpu}'.format(test_suite=test_suite, branch=tr_tds[0].text, OS=tr_tds[2].text, cpu=tr_tds[3].text, gpu=tr_tds[4].text))
                     continue
                 is_pass = test_result.a.text
+                # todo: status Running In VRL
                 if 'Failure' in is_pass:  # no need to triage passing result
                     job_id = test_result.a.get('href')[-7:]
                     job_link = r'http://scvrlweb.nvidia.com/list_result_files.php?job={}'.format(job_id)
@@ -239,6 +247,7 @@ def parse_dvs_changelist(argparser, changelist='3116903139432407.0'):
                         series_layer = []
                         series_errmsg = []
                         series_bug_id = []
+                        series_errors = []
                         for fail_case in failing_cases:
                             series_os.append(os_)
                             series_branch.append(branch)
@@ -249,6 +258,7 @@ def parse_dvs_changelist(argparser, changelist='3116903139432407.0'):
                             series_cmd.append(fail_case.cudnn_cmd)
                             series_layer.append(fail_case.layer)
                             series_errmsg.append(fail_case.fist_error)
+                            series_errors.append(fail_case.error_list)
                             for bug in cudnn_bugs:
                                 if fail_case.existing_bug_id != -1:
                                     break
@@ -257,7 +267,7 @@ def parse_dvs_changelist(argparser, changelist='3116903139432407.0'):
                                         fail_case.set_bug_id(bug.bug_id)
                                         break
                             series_bug_id.append(fail_case.existing_bug_id)
-                            # todo: save bug_id into dataframe
+                        # todo: save bug_id into dataframe
                         data = {
                             'os': series_os,
                             'branch': series_branch,
@@ -267,8 +277,9 @@ def parse_dvs_changelist(argparser, changelist='3116903139432407.0'):
                             'link': series_link,
                             'cmd': series_cmd,
                             'layer': series_layer,
-                            'error_message': series_errmsg,
-                            'bug_id': series_bug_id
+                            'first_error': series_errmsg,
+                            'bug_id': series_bug_id,
+                            'error_msg': series_errors
                         }
                         df = pd.DataFrame(data)
                         df.to_csv('tmp/{}.csv'.format(job_id), index=False)
