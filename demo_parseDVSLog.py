@@ -7,9 +7,10 @@ import argparse
 import shutil
 import pandas as pd
 import json
+import base64
 
 user = 'ffan'
-password = os.environ.get('NVPASSWORD')
+password = base64.b64decode(os.environ.get('NVPASSWORD').encode())
 
 
 class CudnnBug:
@@ -299,6 +300,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--user', type=str, default='ffan', help='nv account')
     parser.add_argument('--password', type=str, help='nv credential')
+    parser.add_argument('--changelist', type=str, help='specify changelist to parse')
     # todo: parse existing bug
     # parse_cudnn_test_log()
     parse_dvs_changelist(argparser=parser)
