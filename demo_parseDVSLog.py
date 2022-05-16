@@ -145,7 +145,7 @@ def parse_cudnn_test_log(file_name=r'/home/fanxin/Downloads/cudnn_triage/test_re
             layer = g.replace('Running test ', '').replace(':', '').strip()
         if error_sym in text and debug_sym not in text:
             first_error = text
-        if 'error' in text.lower() or 'fail' in text.lower():
+        if 'TEST EXECUTION' in text:
             errors.append(text.strip())
         if failed_sym in text and debug_sym not in text and current_case in text:
             # failing_cases[current_case] = (error_msg, layer)
@@ -186,14 +186,6 @@ def get_test_result(job_id='8688253'):
 
 
 def parse_dvs_changelist(argparser, changelist='3116903139432407.0'):
-    # todo: query nvbugs first and catch dup failing cases
-    cudnn_bugs = []
-    bug_ids = query_cudnn_bugs()
-    for bug_id in bug_ids:
-        print(bug_id)
-        cudnn_bug = get_bug(bug_id)
-        if cudnn_bug.failing_cmd:
-            cudnn_bugs.append(cudnn_bug)
     try:
         shutil.rmtree('tmp')
         os.mkdir('tmp')
@@ -208,6 +200,15 @@ def parse_dvs_changelist(argparser, changelist='3116903139432407.0'):
     if 200 <= response.status_code < 300:
         soup = BeautifulSoup(response.text, 'lxml')
         tables = soup.find_all('table', width="1080", border="0", cellspacing="0", cellpadding="0")
+        # query nvbugs first and catch dup failing cases
+        cudnn_bugs = []
+        bug_ids = query_cudnn_bugs()
+        for bug_id in bug_ids:
+            print(bug_id)
+            cudnn_bug = get_bug(bug_id)
+            if cudnn_bug.failing_cmd:
+                cudnn_bugs.append(cudnn_bug)
+
         for table in tables:
             test_suite = table.text.strip().split()[0]
             tables_cell_outline_1 = table.find_all('table', border="0", cellspacing="1", cellpadding="0", width="1080", class_="cell_outline_1")
@@ -303,7 +304,8 @@ def main():
     parser.add_argument('--changelist', type=str, help='specify changelist to parse')
     # todo: parse existing bug
     # parse_cudnn_test_log()
-    parse_dvs_changelist(argparser=parser)
+    args = parser.parse_args()
+    parse_dvs_changelist(argparser=parser, changelist=args.changelist)
 
 
 if __name__ == '__main__':
