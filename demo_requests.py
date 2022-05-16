@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
+import base64
 import shutil
 import timeit
 import time
@@ -81,7 +82,8 @@ def get_cudnn_package(pkg_url=r'http://scdvstransfer.nvidia.com/dvsshare/vol2/cu
     links = soup.find_all('a')
     pkgs = []
     for link in links:
-        if link.get('href').endswith('TESTS.tgz'):  # todo: in case package is failure
+        href = link.get('href')
+        if href.endswith('TESTS.tgz') and 'fail' not in href.lower():  # ignore failing pkg
             pkgs.append(link.get('href'))
     latest_pkg = pkgs[-1]
     file_name = latest_pkg.split(r'/')[-1]
@@ -89,7 +91,8 @@ def get_cudnn_package(pkg_url=r'http://scdvstransfer.nvidia.com/dvsshare/vol2/cu
     local_pkgs = []
     need_to_download = True
     for local_file in local_files:
-        if local_file.endswith('tgz'):
+        # fixme: only remove cudnn_dev pkg here, make reusable
+        if local_file.endswith('tgz') and 'cudnn_dev' in local_file and 'Ubuntu20_04' in local_file:
             local_pkgs.append(local_file)
         if local_file == file_name:
             need_to_download = False
@@ -125,7 +128,7 @@ def get_test_result(file_name=''):
     print('done req_non_exist')
 
 
-def get_cask_bin(cuda='cuda11.7', arch='x86_64', size_type='minimal'):
+def get_cask_bin(cuda='cuda11.7', arch='x86_64', OS='linux', size_type='minimal'):
     # fixme: move to a separate function
     homedir = os.path.expanduser(r'~')
     workdir = os.path.join(homedir, 'cudnn_pkg')
@@ -136,14 +139,14 @@ def get_cask_bin(cuda='cuda11.7', arch='x86_64', size_type='minimal'):
     os.chdir(workdir)
     # todo: make reusable by adding parameters
     user = 'ffan'
-    password = os.environ.get('NVPASSWORD')
+    password = base64.b64decode(os.environ.get('NVPASSWORD').encode())
     url = r'https://urm.nvidia.com/artifactory/sw-fastkernels-generic/cicd/cask_sdk/feature_5.0_cbi_cudnn/Nightly_for_CUDNN/'
     response = requests.get(url, auth=(user, password))
     if 200 <= response.status_code < 300:
         soup = BeautifulSoup(response.text, 'lxml')
         links = soup.find_all('a')
         links.pop(0)  # remove href '../'
-        new = 0
+        new = 0  # todo: we only try to download the newest pkg, in case we need more cask pkgs
         for link in links:
             curr = int(link.get('href')[:-1])
             if curr > new:
@@ -154,15 +157,23 @@ def get_cask_bin(cuda='cuda11.7', arch='x86_64', size_type='minimal'):
         soup_1 = BeautifulSoup(response_1.text, 'lxml')
         links_1 = soup_1.find_all('a')
         for link in links_1:
-            if cuda in link.text and arch in link.text and size_type in link.text:
+            if cuda in link.text and arch in link.text and size_type in link.text and OS in link.text:
                 down_link = ''.join([latest_cask_url, link.text])
-                print(f'start to download {down_link}')
-                with open('down.txt', 'w') as f:
-                    f.write(down_link)
-                with requests.get(down_link, auth=(user, password)) as r:  # fixme: check response status_code
-                    with open('cask.tar.gz', 'wb') as f:
-                        for chunk in r.iter_content(chunk_size=4096):
-                            f.write(chunk)
+                filename = down_link.split('/')[-1]
+                if filename not in os.listdir():
+                    print(f'start to download {down_link}')
+                    # with open(filename, 'w'):
+                    #     pass
+                    with open('down.txt', 'w') as f:  # todo: do we need more log info?
+                        f.write(down_link)
+                    with requests.get(down_link, auth=(user, password)) as r:  # fixme: check response status_code
+                        with open(filename, 'wb') as f:
+                            for chunk in r.iter_content(chunk_size=4096):
+                                f.write(chunk)
+                    # remove old cask file
+                    for f in os.listdir():
+                        if f != filename and 'cask_sdk' in f:
+                            os.remove(f)
     print('done get_cask_bin')
 
 
@@ -170,9 +181,9 @@ def main():
     # download_file(url=url)
     # timer(func=download_file, arg1=url)
     # demo()
-    # get_cudnn_package()
     # get_test_result()
-    get_cask_bin()
+    get_cudnn_package()
+    # get_cask_bin()
 
 
 if __name__ == '__main__':
