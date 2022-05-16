@@ -106,9 +106,8 @@ def get_cudnn_package(pkg_url=r'http://scdvstransfer.nvidia.com/dvsshare/vol2/cu
                 for chunk in r.iter_content(chunk_size=4096):
                     f.write(chunk)
         print('Done download')
-        if local_pkgs:
-            for pkg in local_pkgs:
-                os.remove(pkg)
+        for pkg in local_pkgs:
+            os.remove(pkg)
     else:
         print('No need to download cudnn packages from server\n')
 
