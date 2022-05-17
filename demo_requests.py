@@ -5,7 +5,6 @@ import shutil
 import timeit
 import time
 import os
-import threading
 
 
 def timer_func(func):
@@ -160,19 +159,21 @@ def get_cask_bin(cuda='cuda11.7', arch='x86_64', OS='linux', size_type='minimal'
                 down_link = ''.join([latest_cask_url, link.text])
                 filename = down_link.split('/')[-1]
                 if filename not in os.listdir():
-                    print(f'start to download {down_link}')
                     # with open(filename, 'w'):
                     #     pass
                     with open('down.txt', 'w') as f:  # todo: do we need more log info?
                         f.write(down_link)
                     with requests.get(down_link, auth=(user, password)) as r:  # fixme: check response status_code
                         with open(filename, 'wb') as f:
+                            print(f'start to download {down_link}')
                             for chunk in r.iter_content(chunk_size=4096):
                                 f.write(chunk)
-                    # remove old cask file
+                    # todo: move to other place. post action: remove old cask file
                     for f in os.listdir():
                         if f != filename and 'cask_sdk' in f:
+                            print(f'remove {f}')
                             os.remove(f)
+                    break
     print('done get_cask_bin')
 
 
@@ -181,8 +182,8 @@ def main():
     # timer(func=download_file, arg1=url)
     # demo()
     # get_test_result()
-    get_cudnn_package()
-    # get_cask_bin()
+    # get_cudnn_package()
+    get_cask_bin()
 
 
 if __name__ == '__main__':
