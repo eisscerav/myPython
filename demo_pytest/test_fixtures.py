@@ -26,6 +26,13 @@ def fruit_bowl():
     return [Fruit("apple"), Fruit("banana")]
 
 
+@pytest.fixture
+def resource():
+    print("setup")
+    yield
+    print("teardown")
+
+
 def test_fruit_salad(fruit_bowl):
     # Act
     fruit_salad = FruitSalad(*fruit_bowl)
@@ -33,6 +40,10 @@ def test_fruit_salad(fruit_bowl):
     # Assert
     assert all(fruit.cubed for fruit in fruit_salad.fruit)
 
+
+def test_setupteardown(resource):
+    print("\ntest_setupteardown to call setup and teardown")
+    assert 1
 
 # Arrange
 # bowl = fruit_bowl()
