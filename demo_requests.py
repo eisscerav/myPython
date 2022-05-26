@@ -182,8 +182,8 @@ def main():
     # timer(func=download_file, arg1=url)
     # demo()
     # get_test_result()
-    # get_cudnn_package()
     get_cask_bin()
+    get_cudnn_package()
 
 
 if __name__ == '__main__':

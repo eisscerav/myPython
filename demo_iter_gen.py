@@ -11,10 +11,13 @@ def fibonacci(n):  # 生成器函数 - 斐波那契
         counter += 1
 
 
+def demo_generator(gen):
+    for i in gen:
+        print(i)
+
 def main():
     f = fibonacci(10)  # f 是一个迭代器，由生成器返回生成
-    for i in f:
-        print(i)
+    demo_generator(f)
     # while True:
     #     try:
     #         print(next(f), end=" ")

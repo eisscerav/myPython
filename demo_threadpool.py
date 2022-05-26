@@ -1,9 +1,9 @@
 from multiprocessing.pool import ThreadPool
 import time
 
-
+# todo: demo thread lock(Thread Synchronization), refer to https://wrapt.readthedocs.io/en/latest/examples.html#thread-synchronization
 def wrapper(args):
-    print(*args)
+    # print(*args)
     foo(*args)
 
 
@@ -18,8 +18,8 @@ def multi_thread_pool():
     age = [41, 40, 11, 4]
     pool = ThreadPool(10)
     # launch thread
-    # for i in range(4):
-    #     pool.apply_async(foo, args=(name[i], age[i]))
+    for i in range(4):
+        pool.apply_async(foo, args=(name[i], age[i]))
     # another way to launch thread, passing more than 1 arg
     pool.map(wrapper, zip(name, age))
     pool.close()
