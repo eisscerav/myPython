@@ -1,3 +1,4 @@
+import glob
 import os
 import re
 import pandas as pd
@@ -7,6 +8,9 @@ class Person:
     def __init__(self, name, age):
         self.name = name
         self.age = age
+
+    def __str__(self):
+        return self.name
 
     def get_name(self):
         return self.name
@@ -113,21 +117,35 @@ def foo(*args):
     for arg in args:
         print(arg)
 
-def bar(*args):
-    print(args)
-    foo(*args)
+def bar(**kargs):
+    for k in kargs:
+        print(f'{k}: {kargs[k]}')
 
-def zoo():
-    bar(1, 2, 3)
 
 def main():
-    zoo()
+    y = [x for x in range(10)]
+    foo(*y)
+    my_data = dict()
+    for e in y:
+        my_data[f'{e}'] = e**2
+    bar(**my_data)
+    print(pow(2, 3))
+    l1 = [[1,2,3,], [4,5,6,],]
+    l2 = [ele for sub in l1 for ele in sub]
+    env = ''
+    with open('env.txt', 'w') as fp:
+        for k in os.environ:
+           str_ = f'{k}={os.environ[k]}\n'
+           env += str_
+           # print(str_)
+        fp.writelines(env)
     # demo()
     # demo1()
     # demo_class()
     # demo_file_op()
     # parse_offline_program()
     # demo_chinese()
+    print('done main')
 
 
 if __name__ == '__main__':
