@@ -17,6 +17,7 @@ def demo_argparse():
     parser.add_argument('--family', type=str, help='first name')
     parser.add_argument('--name', type=str, dest='ffan_name', metavar='meta', help='last name')
     parser.add_argument('--env_name', type=str, default='argparse_env.txt', help='save as env_name.txt')
+    parser.add_argument('--cask', action='store_true', default=False, help='To get cask package')
     args = parser.parse_args()
 
     print(f"args.family={args.family}, args.ffan_name={args.ffan_name}")
