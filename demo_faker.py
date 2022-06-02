@@ -6,7 +6,7 @@ import logging
 def demo_fake():
     fake = Faker()
     name = fake.name()
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     logging.debug("Harmless debug Message")
     logging.info("Just an information")
     logging.warning("Its a Warning")
