@@ -1,29 +1,93 @@
+import random
 from multiprocessing.pool import ThreadPool
 import time
+import requests
+from faker import Faker
+from demo_requests import timer_func
+from bs4 import BeautifulSoup
+
+
+class Person:
+    def __init__(self):
+        self.name = ''
+        self.age = 0
+
+root_url = r'http://scdvstransfer.nvidia.com/dvsshare/vol2/'
+cudnn_urls = [
+    'http://scdvstransfer.nvidia.com/dvsshare/vol2/cudnn_v8.2_cuda_11.4_Release_Windows_dvsConfigCheck/',
+    'http://scdvstransfer.nvidia.com/dvsshare/vol2/cudnn_v8.2_cuda_11.4_Release_Windows_wddm-x64_Display_Driver/',
+    'http://scdvstransfer.nvidia.com/dvsshare/vol2/cudnn_v8.2_cuda_11.4_Release_Windows_wddm-x64_Display_Driver_Package_import_ausdvs/',
+    'http://scdvstransfer.nvidia.com/dvsshare/vol2/cudnn_v8.2_cuda_11.4_Release_Windows_wddm2-x64_Display_Driver/',
+    'http://scdvstransfer.nvidia.com/dvsshare/vol2/cudnn_v8.2_cuda_11.4_Release_Windows_wddm2-x64_Display_Driver_Package_import_ausdvs/',
+    'http://scdvstransfer.nvidia.com/dvsshare/vol2/cudnn_v8.2_cuda_11.4_Release_Windows_x86_CUDA_Driver/',
+    'http://scdvstransfer.nvidia.com/dvsshare/vol2/cudnn_v8.2_orin_cuda_11.4_Release_Linux_Ubuntu20_04_AMD64_CUDNN_FRONTEND_UNIT_TESTS/',
+    'http://scdvstransfer.nvidia.com/dvsshare/vol2/cudnn_v8.2_orin_cuda_11.4_Release_Linux_Ubuntu20_04_AMD64_CUDNN_SAMPLES_TESTS/',
+    'http://scdvstransfer.nvidia.com/dvsshare/vol2/r10.1u2_GA_ossuary_Release_Windows_AMD64_GPGPU_CUDA_CUBLAS_CUDNN/',
+    'http://scdvstransfer.nvidia.com/dvsshare/vol2/r10.2_GA_ossuary_Release_Windows_AMD64_GPGPU_CUDA_CUBLAS_CUDNN/',
+]
 
 # todo: demo thread lock(Thread Synchronization), refer to https://wrapt.readthedocs.io/en/latest/examples.html#thread-synchronization
-def wrapper(args):
+def wrapper_foo(args):
     # print(*args)
-    foo(*args)
+    return foo(*args)
 
 
-def foo(name, age):
-    if name == 'fancy':
-        time.sleep(1)
-    print(f'hi {name}, you are {age}')
+def foo(name, age, n):
+    n = n*2
+    greeting = f'hi {name}, you are {age}'
+    # if name == 'fancy':
+    #     time.sleep(1)
+    print(f'{n}, {greeting}')
+    return n, greeting
 
 
+def wrapper_bar(args):
+    return bar(*args)
+
+
+def bar(url):
+    p = Person()  # each thread holds and individual instance
+    response = requests.get(url)
+    return response.text
+
+
+def all_urls():
+    global url
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'lxml')
+    links = soup.find_all('a')
+    for i, link in enumerate(links):
+        if 'cudnn' in link.get('href').lower():
+            print(f"http://scdvstransfer.nvidia.com{link.get('href')}")
+
+
+@timer_func
 def multi_thread_pool():
-    name = ['fancy', 'sof', 'jenny', 'jerry']
-    age = [41, 40, 11, 4]
+    fake = Faker()
+    names = []
+    ages = []
+    num = []
+    for i in range(20):
+        names.append(fake.name())
+        ages.append(random.randint(0, 80))
+        num.append(i)
     pool = ThreadPool(10)
     # launch thread
-    for i in range(4):
-        pool.apply_async(foo, args=(name[i], age[i]))
+    # for i in range(4):
+    #     pool.apply_async(foo, args=(name[i], age[i]))
     # another way to launch thread, passing more than 1 arg
-    pool.map(wrapper, zip(name, age))
+    outputs = pool.map(bar, cudnn_urls)
+    # outputs = pool.map_async(bar, cudnn_urls)
+    # output = pool.map(wrapper_bar, zip(num, names))
+    # for i in range(20):
+    #     pool.apply_async(bar, args=([1]))
+        # pool.apply(foo, args=(names[i], ages[i], num[i]))
+        # pool.apply_async(wrapper_popen, args=(cmd[i], buff_log[i]))
+    # pool.map(wrapper_popen, zip(cmd, buff_log))
     pool.close()
     pool.join()
+    # for i in cudnn_urls:
+    #     print(requests.get(i).text)
 
 
 if __name__ == '__main__':
