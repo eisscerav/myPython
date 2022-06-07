@@ -1,7 +1,7 @@
-import random
 from multiprocessing.pool import ThreadPool
-import time
+from concurrent.futures import ThreadPoolExecutor
 import requests
+import random
 from faker import Faker
 from demo_requests import timer_func
 from bs4 import BeautifulSoup
@@ -45,10 +45,13 @@ def wrapper_bar(args):
     return bar(*args)
 
 
-def bar(url):
-    p = Person()  # each thread holds and individual instance
+def bar(url, num):
+    l = list()
+    d = dict()
+    print(hex(id(l)))
+    p = Person()  # each thread holds an individual instance
     response = requests.get(url)
-    return response.text
+    return response.text, num
 
 
 def all_urls():
@@ -71,7 +74,7 @@ def multi_thread_pool():
         names.append(fake.name())
         ages.append(random.randint(0, 80))
         num.append(i)
-    pool = ThreadPool(10)
+    pool = ThreadPool(5)
     # launch thread
     # for i in range(4):
     #     pool.apply_async(foo, args=(name[i], age[i]))
@@ -90,5 +93,18 @@ def multi_thread_pool():
     #     print(requests.get(i).text)
 
 
+def demo_thread_poll_executor():
+    # refer to https://superfastpython.com/threadpoolexecutor-map-vs-submit/
+    x = len(cudnn_urls)
+    thread_num = [i for i in range(x)]
+    pool = ThreadPoolExecutor(max_workers=5)
+    results = pool.map(wrapper_bar, zip(cudnn_urls, thread_num))
+
+    for res in results:
+        print(res)
+    pool.shutdown()
+
+
 if __name__ == '__main__':
-    multi_thread_pool()
+    # multi_thread_pool()
+    demo_thread_poll_executor()
