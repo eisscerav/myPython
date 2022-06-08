@@ -1,7 +1,14 @@
 import glob
+import subprocess
 import os
 import re
 import pandas as pd
+import sys
+try:
+    import django
+except ModuleNotFoundError as e:
+    python = sys.executable
+    subprocess.run(f'{python} -m pip install django')
 
 
 class Person:
@@ -130,8 +137,11 @@ def main():
         my_data[f'{e}'] = e**2
     bar(**my_data)
     print(pow(2, 3))
-    l1 = [[1,2,3,], [4,5,6,],]
-    l2 = [ele for sub in l1 for ele in sub]
+    l1 = [1, 2, 3]
+    l2 = [4, 5]
+    l3 = zip(l1, l2)
+    for l in l3:
+        print(l)
     env = ''
     with open('env.txt', 'w') as fp:
         for k in os.environ:
