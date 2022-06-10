@@ -5,6 +5,8 @@ import logging
 # official doc: https://pypi.org/project/Faker/
 def demo_fake():
     fake = Faker()
+    profile1 = fake.simple_profile()
+    profile2 = fake.profile()
     name = fake.name()
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     logging.debug("Harmless debug Message")
