@@ -4,6 +4,7 @@ import os
 import re
 import pandas as pd
 import sys
+import datetime
 try:
     import django
 except ModuleNotFoundError as e:
@@ -129,7 +130,14 @@ def bar(**kargs):
         print(f'{k}: {kargs[k]}')
 
 
+def demo_datetime():
+    date = datetime.date(2020, 5, 17)  # create date
+    date_v2 = datetime.datetime.strptime('2021-10-22', '%Y-%m-%d').date()  # convert string to date
+    print('done demo_datetime')
+
+
 def main():
+
     y = [x for x in range(10)]
     foo(*y)
     my_data = dict()
