@@ -83,6 +83,14 @@ def test3(file1=r"d:\a.csv", file2=r"d:\b.csv"):
 
 def test4():
     df = pd.read_csv(r"data/nba.csv")
+    for index, row in df.iterrows():
+        name = row.get('Name')
+        team = row.get('Team')
+        age = row.get('Age')
+        college = row.get('College')
+        height = row.get('Height')
+        position = row.get('Position')
+        none = row.get('None')
     columns = df.columns
     # read each column
     # col_by_name = df['Team']
