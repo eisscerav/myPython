@@ -3,7 +3,7 @@ import os
 
 
 def demo():
-    sample = b'Yv8KKxJG$JDy'
+    sample = b'We love nvidia'
     encode = base64.b64encode(sample)
     decode = base64.b64decode(encode).decode()
     # decode = base64.b64decode(encode)
