@@ -7,6 +7,10 @@ ${"this is some text" | u}
     this is some output when x==5
 % endif
 
+% for i in mylist:
+    <h5>${i['comp']}, ${i['val']}</h5>
+% endfor
+
 % for a in ['one', 'two', 'three', 'four', 'five']:
     % if a[0] == 't':
     its two or three
@@ -56,3 +60,4 @@ ${myfunc(7)}
 
 ## demo how to pass and use class in template
 <h3>${person.name}, ${person.age}</h3>
+<h5>person.name, person.age</h5>
