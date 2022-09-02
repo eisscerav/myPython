@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 import requests
 
 cudnn_doc_url = 'https://docs.nvidia.com/deeplearning/cudnn/api/index.html'
-
 section = {
     'ops_infer': '3.2',
     'ops_train': '4.1',
@@ -11,6 +10,10 @@ section = {
     'adv_infer': '7.2',
     'adv_train': '8.2',
 }
+deprecated = 'This function has been deprecated in cuDNN'
+class CUDNN_API:
+    api_name = ''
+    is_deprecated = False
 
 
 def parse_cudnn_api(soup, section_number='3.2'):
@@ -23,8 +26,15 @@ def parse_cudnn_api(soup, section_number='3.2'):
         if h3.a.text.startswith(section_number):
             kbd = h3.find('kbd', class_='ph userinput')
             if kbd: # should be API name
-                api_name = kbd.text.replace('()', '')
-                pub_api.append(api_name)
+                cudnn_api = CUDNN_API()
+                cudnn_api.api_name = kbd.text.replace('()', '')
+                # pub_api.append(api_name)
+                all_p = h3.parent.find_all('p')
+                for p in all_p:
+                    if deprecated in p.text:
+                        # todo, set api property here
+                        cudnn_api.is_deprecated = True
+                pub_api.append(cudnn_api)
                 # pub_api.append(api_name+'\n')
             # else:  # should be title
             #     name = h3.a.get('name')
@@ -41,13 +51,18 @@ def get_soup():
     return soup
 
 
-def main():
+def get_cudnn_api():
     soup = get_soup()
+    # parse_cudnn_api_v2(soup)
     pub_api = []
     # section 4.1: ops_train, 5.2: cnn_infer, 6.2: cnn_train, 7.2: adv_infer, 8.2: adv_train
     for k, v in section.items():
         pub_api += parse_cudnn_api(soup, v)
-    print('done ')
+    return pub_api
+
+
+def main():
+    get_cudnn_api()
 
 
 if __name__ == '__main__':
