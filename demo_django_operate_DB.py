@@ -49,10 +49,10 @@ def convert_to_json():
     all_cov_data_list = []
     for cov_data in all_cov_data:
         module_cov = cov_data.modulecov_set.all()
-        module_cov_data = {}
         module_cov_list = []
         for each in module_cov:
             print(each)
+            module_cov_data = {}
             module_cov_data['bcov_count'] = each.bcov_count
             module_cov_data['bcov_per'] = each.bcov_per
             module_cov_data['bcov_total'] = each.bcov_total
@@ -73,7 +73,7 @@ def convert_to_json():
         cov_data_d['cudnn_branch'] = cov_data.cudnn_branch
         cov_data_d['cudnn_cl'] = cov_data.cudnn_cl
         cov_data_d['cudnn_version'] = cov_data.cudnn_version
-        cov_data_d['cuda_version'] = cov_data.cuda_version
+        cov_data_d['cuda_version'] = int(cov_data.cuda_version)
         cov_data_d['report_date'] = cov_data.report_date.strftime("%Y-%m-%d")
         cov_data_d['report_link'] = cov_data.report_link
         cov_data_d['vectorcast_version'] = cov_data.vectorcast_version
@@ -83,7 +83,7 @@ def convert_to_json():
         cov_data_d['layer_file'] = cov_data.layer_file
         cov_data_d['label_file'] = cov_data.label_file
         # module_coverage, overall_coverage
-        cov_data_d['module_coverage'] = module_cov_data
+        cov_data_d['module_coverage'] = module_cov_list
         cov_data_d['overall_coverage'] = overall_cov_data
         cov_data_d['total_tests_added'] = cov_data.total_tests_added
         cov_data_d['total_bugs_filed'] = cov_data.total_bugs_filed
