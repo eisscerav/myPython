@@ -38,5 +38,18 @@ def demo_split():
     lst = [re.split(":? ", entry, 3) for entry in entries]
 
 
+def demo_tmp():
+    text = '__global__ void __launch_bounds__(256) memcpyWithTypeConversion(const int64_t size, T_IN const* src, T_OUT* dst) {     const int64_t index = (int64_t)blockIdx.x * blockDim.x + threadIdx.x;'
+    # text = '__launch_bounds__(THREADS, 1) __global__ void softmax_fw_kernel_resident(struct cudnnTensorStruct g_imgIn,'
+    # text = ':__launch_bounds__(THREADS) __global__ void softmax_fw_kernel(struct cudnnTensorStruct g_imgIn,'
+    # p = r'\bsoftmax_fw_kernel\b'
+    m = re.search("void (.*)\(", text)
+    # m = re.search(p, text)
+    kernel_name = m.group(1)
+    span = m.span()
+    kernel = text[span[0]:span[1]]
+    print('done demo_tmp')
+
+
 if __name__ == '__main__':
-    demo()
+    demo_tmp()

@@ -32,8 +32,8 @@ def parse_cudnn_api(soup, section_number='3.2'):
                 all_p = h3.parent.find_all('p')
                 for p in all_p:
                     if deprecated in p.text:
-                        # todo, set api property here
                         cudnn_api.is_deprecated = True
+                        break
                 pub_api.append(cudnn_api)
                 # pub_api.append(api_name+'\n')
             # else:  # should be title

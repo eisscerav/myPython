@@ -15,8 +15,8 @@ def demo_mako_template():
     # r1 = t.render(name='mako', x=5, y=2, my_company=my_dict)
     person = Person('fancy', 40)
     mylist = [
-        {'comp': 'nv', 'val': 200},
-        {'comp': 'google', 'val': 400}
+        # {'comp': 'nv', 'val': 200},
+        # {'comp': 'google', 'val': 400}
     ]
     data = {
         'name': 'mako',

@@ -40,7 +40,13 @@ def quick_start():
 
 
 def demo():
-    soup = BeautifulSoup('<b class="boldest">Extremely bold</b>')
+    # soup = BeautifulSoup('<p><b class="boldest">Extremely bold</b><p>')
+    soup = BeautifulSoup('<p><b class="boldest">Extremely bold</b></p>')
+    p = soup.p
+    for sub_p in p.children:
+        print(sub_p)
+    tmp = p.b
+    non = p.a
     tag = soup.b
     name = tag.name
     tag.name = "blockquote"

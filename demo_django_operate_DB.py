@@ -44,7 +44,7 @@ def get_report_data():
     print('done')
 
 
-def convert_to_json():
+def convert_data_to_json():
     all_cov_data = CovData.objects.all()
     all_cov_data_list = []
     for cov_data in all_cov_data:
@@ -52,15 +52,9 @@ def convert_to_json():
         module_cov_list = []
         for each in module_cov:
             print(each)
-            module_cov_data = {}
-            module_cov_data['bcov_count'] = each.bcov_count
-            module_cov_data['bcov_per'] = each.bcov_per
-            module_cov_data['bcov_total'] = each.bcov_total
-            module_cov_data['lcov_count'] = each.lcov_count
-            module_cov_data['lcov_per'] = each.lcov_per
-            module_cov_data['lcov_total'] = each.lcov_total
-            module_cov_data['name'] = each.name
-            module_cov_data['page'] = each.page
+            module_cov_data = {'bcov_count': each.bcov_count, 'bcov_per': each.bcov_per, 'bcov_total': each.bcov_total,
+                               'lcov_count': each.lcov_count, 'lcov_per': each.lcov_per, 'lcov_total': each.lcov_total,
+                               'name': each.name, 'page': each.page}
             module_cov_list.append(module_cov_data)
         overall_cov = cov_data.overallcov
         overall_cov_data = {'bcov_count': overall_cov.bcov_count, 'bcov_per': overall_cov.bcov_per,
@@ -68,25 +62,16 @@ def convert_to_json():
                             'lcov_per': overall_cov.lcov_per, 'lcov_total': overall_cov.lcov_total,
                             'name': overall_cov.name, 'page': overall_cov.page}
         print(overall_cov)
-        cov_data_d = {}
-        cov_data_d['cudnn_version_cl'] = cov_data.cudnn_version_cl
-        cov_data_d['cudnn_branch'] = cov_data.cudnn_branch
-        cov_data_d['cudnn_cl'] = cov_data.cudnn_cl
-        cov_data_d['cudnn_version'] = cov_data.cudnn_version
-        cov_data_d['cuda_version'] = int(cov_data.cuda_version)
-        cov_data_d['report_date'] = cov_data.report_date.strftime("%Y-%m-%d")
-        cov_data_d['report_link'] = cov_data.report_link
-        cov_data_d['vectorcast_version'] = cov_data.vectorcast_version
-        cov_data_d['file_num'] = cov_data.file_num
-        cov_data_d['test_set'] = cov_data.test_set
-        cov_data_d['test_num'] = cov_data.test_num
-        cov_data_d['layer_file'] = cov_data.layer_file
-        cov_data_d['label_file'] = cov_data.label_file
+        cov_data_d = {'cudnn_version_cl': cov_data.cudnn_version_cl, 'cudnn_branch': cov_data.cudnn_branch,
+                      'cudnn_cl': cov_data.cudnn_cl, 'cudnn_version': cov_data.cudnn_version,
+                      'cuda_version': int(cov_data.cuda_version),
+                      'report_date': cov_data.report_date.strftime("%Y-%m-%d"), 'report_link': cov_data.report_link,
+                      'vectorcast_version': cov_data.vectorcast_version, 'file_num': cov_data.file_num,
+                      'test_set': cov_data.test_set, 'test_num': cov_data.test_num, 'layer_file': cov_data.layer_file,
+                      'label_file': cov_data.label_file, 'module_coverage': module_cov_list,
+                      'overall_coverage': overall_cov_data, 'total_tests_added': cov_data.total_tests_added,
+                      'total_bugs_filed': cov_data.total_bugs_filed}
         # module_coverage, overall_coverage
-        cov_data_d['module_coverage'] = module_cov_list
-        cov_data_d['overall_coverage'] = overall_cov_data
-        cov_data_d['total_tests_added'] = cov_data.total_tests_added
-        cov_data_d['total_bugs_filed'] = cov_data.total_bugs_filed
         print(cov_data)
         all_cov_data_list.append(cov_data_d)
     with open('history.json', 'w') as f:
@@ -97,6 +82,6 @@ def convert_to_json():
 if __name__ == '__main__':
     python = sys.executable
     print(python)
-    convert_to_json()
+    convert_data_to_json()
     # get_report_data()
     # generate_persons()

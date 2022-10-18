@@ -20,8 +20,9 @@ def demo_sub_popen():
     save_env('subprocess_env.txt')
     cmd = 'python3 argparse_exer.py --family nvidia --name ampere --env_name sub_popen.txt'
     cmd = 'ls -l'
+    cmd = 'p4 info'
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    # p = subprocess.Popen(cmd, shell=True, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # p = subprocess.Popen(cmd_list, shell=True, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # stdout = p.stdout.readlines()  # return a list(looks like separate by newline) and no output later in communicate
     # stderr = p.stderr.readlines()
     # Use communicate() rather than .stdin.write, .stdout.read or .stderr.read to avoid deadlock
