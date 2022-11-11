@@ -23,7 +23,13 @@ class CudnnBug:
 def get_bug(bug_id=3470737):
     bug_id = 3542339
     url = "https://nvbugsapi.nvidia.com/nvbugswebserviceapi/api/bug/getbug/{}".format(bug_id)
-    response = requests.get(url, auth=HTTPBasicAuth(user, password))
+    token = os.environ.get('NVBUGS_TOKEN_FFAN')
+    headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer '+token
+    }
+    # response = requests.get(url, auth=HTTPBasicAuth(user, password))
+    response = requests.get(url, headers=headers)
     content = response.content
     failing_case = []
     data = json.loads(response.text)
