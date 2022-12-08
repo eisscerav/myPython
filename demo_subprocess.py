@@ -3,6 +3,15 @@ import os
 from argparse_exer import save_env
 
 
+def run_cmd(cmd):
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    out, err = p.communicate()
+    if p.returncode:
+        print(f'Error message: {err}')
+        raise RuntimeError(f'Fail to run {cmd} with return code {p.returncode}')
+    return out
+
+
 # todo: add demo for subprocess.run()
 def demo_sub_run():
     save_env('subprocess_env.txt')
