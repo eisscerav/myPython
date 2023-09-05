@@ -4,13 +4,21 @@ import subprocess
 import random
 import json
 from faker import Faker
-subprocess.run(f'{sys.executable} -m pip install django', shell=True)
-subprocess.run(f'{sys.executable} -m pip install mysqlclient', shell=True)
-import django
-sys.path.append(r"/home/ffan/VC_on_cudnn_Win_remote/cudnn_site")
+try:
+    import django
+except ImportError:
+    subprocess.run(f'{sys.executable} -m pip install django', shell=True)
+    subprocess.run(f'{sys.executable} -m pip install mysqlclient', shell=True)
+sys.path.append(r"/home/ffan/pycharm_remote/vectorcast_on_cudnn/cudnn_site")
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cudnn_site.settings')
 django.setup()
 from vectorcast.models import Person, ModuleCov, CovData, OverallCov  # set django env var and call setup first then import models
+
+
+def look_for_persons():
+    persons = Person.objects.all()
+    for p in persons:
+        print(p.name)
 
 
 def generate_persons():
@@ -27,7 +35,8 @@ def generate_persons():
         birthdate = profile.get('birthdate')
         job = profile.get('job')
         phone = fake.phone_number()
-        p = Person(username=username, name=name, sex=sex, address=address, mail=mail, birthdate=birthdate, job=job, phone=phone)
+        p = Person(username=username, name=name, sex=sex, address=address, mail=mail, birthdate=birthdate, job=job,
+                   phone=phone)
         p.save()
 
 
@@ -82,6 +91,7 @@ def convert_data_to_json():
 if __name__ == '__main__':
     python = sys.executable
     print(python)
-    convert_data_to_json()
+    # convert_data_to_json()
     # get_report_data()
-    # generate_persons()
+    # look_for_persons()
+    generate_persons()
