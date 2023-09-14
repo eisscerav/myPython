@@ -1,16 +1,21 @@
 from multiprocessing.pool import ThreadPool
+# from multiprocessing import RLock
 from concurrent.futures import ThreadPoolExecutor
 import requests
 import random
-from faker import Faker
 from demo_requests import timer_func
 from bs4 import BeautifulSoup
+from faker import Faker
+import threading
 
+# lock = RLock()
+persons = []
+lock = threading.Lock()
 
 class Person:
     def __init__(self):
         self.name = ''
-        self.age = 0
+        self.birthday = 0
 
 root_url = r'http://scdvstransfer.nvidia.com/dvsshare/vol2/'
 cudnn_urls = [
@@ -42,14 +47,18 @@ def foo(name, age, n):
 
 
 def wrapper_bar(args):
+    print("run wrapper_bar")
     return bar(*args)
 
 
 def bar(url, num):
-    l = list()
-    d = dict()
-    print(hex(id(l)))
+    fake = Faker()
+    profile1 = fake.simple_profile()
     p = Person()  # each thread holds an individual instance
+    p.name = profile1.get('name')
+    p.birthday = profile1.get('birthdate')
+    with lock:
+        persons.append(p)
     response = requests.get(url)
     return response.text, num
 
@@ -93,6 +102,20 @@ def multi_thread_pool():
     #     print(requests.get(i).text)
 
 
+address_list = []
+def multi_thread_with_lock_wrapper(args):
+    return multi_thread_with_lock(*args)
+
+
+def multi_thread_with_lock(n):
+    fake = Faker()
+    profile1 = fake.simple_profile()
+    lock.acquire()
+    address_list.append(profile1.address)
+    lock.release()
+    return
+
+
 def demo_thread_poll_executor():
     # refer to https://superfastpython.com/threadpoolexecutor-map-vs-submit/
     x = len(cudnn_urls)
@@ -100,11 +123,12 @@ def demo_thread_poll_executor():
     pool = ThreadPoolExecutor(max_workers=5)
     results = pool.map(wrapper_bar, zip(cudnn_urls, thread_num))
 
-    for res in results:
-        print(res)
+    # for res in results:
+    #     print(res)
     pool.shutdown()
 
 
 if __name__ == '__main__':
     # multi_thread_pool()
     demo_thread_poll_executor()
+    print('done main')
