@@ -20,7 +20,17 @@ class Student(Person):
         print(f"and you are in grade {self.grade}\n")
 
 
+class Demo:
+    def __init__(self):
+        self.name: str
+        self.age: int
+
+
 if __name__ == "__main__":
     stu = Student("ffan", 30, 8)
     stu.show()
+    demo = Demo()
+    demo.name = 1
+    print("done")
+
 
