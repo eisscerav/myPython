@@ -27,6 +27,7 @@ class Demo:
 
 
 if __name__ == "__main__":
+    comp: str
     stu = Student("ffan", 30, 8)
     stu.show()
     demo = Demo()

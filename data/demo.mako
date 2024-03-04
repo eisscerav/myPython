@@ -7,9 +7,11 @@ ${"this is some text" | u}
     this is some output when x==5
 % endif
 
+% if mylist:
 % for i in mylist:
     <h5>${i['comp']}, ${i['val']}</h5>
 % endfor
+% endif
 
 % for a in ['one', 'two', 'three', 'four', 'five']:
     % if a[0] == 't':

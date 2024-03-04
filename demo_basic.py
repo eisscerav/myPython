@@ -137,7 +137,16 @@ def demo_datetime():
 
 
 def main():
-
+    l = ['arch80', 'host']
+    s = '_'.join(l)
+    my_dict = {
+        'name': 'fan',
+        'age': 20
+    }
+    for k, v in my_dict.items():
+        print(k, v)
+    import shutil
+    cmd = shutil.which('gcc')
     y = [x for x in range(10)]
     foo(*y)
     my_data = dict()

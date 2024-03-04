@@ -23,6 +23,5 @@ def demo_fake():
     print('demo fake done!!')
 
 
-
 if __name__ == '__main__':
     demo_fake()

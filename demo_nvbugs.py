@@ -62,7 +62,9 @@ def get_nvbugs():
     # refer https://confluence.nvidia.com/display/NVBUG/GetBugs+API
     url = r"https://nvbugsapi.nvidia.com/NVBugsWebServiceApi/api/Search/GetBugs?page=1&limit=100"
     # url = r"https://nvbugsapi.nvidia.com/NVBugsWebServiceApi/api/Search/GetBugs"
-    headers = {'Content-type': 'application/json'}
+    token = os.environ.get("NVBUGS_TOKEN")
+    headers = {'Content-type': 'application/json',
+               'Authorization': "Bearer " + token}
 
     # data = [
     #     {"FieldName": "BugRequesterFullName",   "FieldValue": "Fancy Fan"},
@@ -74,7 +76,8 @@ def get_nvbugs():
     ]
 
     payload = json.dumps(data)
-    response = requests.post(url, data=payload, auth=HTTPBasicAuth(user, password), headers=headers)
+    # response = requests.post(url, data=payload, auth=HTTPBasicAuth(user, password), headers=headers)
+    response = requests.post(url, data=payload, headers=headers)
     toJson = response.json()
     # for key in toJson:
     #     print("key: {}, value:{}".format(key, toJson[key]))
@@ -102,5 +105,5 @@ def get_nvbugs():
 
 
 if __name__ == '__main__':
-    get_bug()
+    # get_bug()
     get_nvbugs()
