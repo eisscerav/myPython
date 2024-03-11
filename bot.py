@@ -1,24 +1,27 @@
 import slack
 from slack.errors import SlackApiError
 import os
+import base64
 
 
 def post_msg(channel, msg):
+    encode_tok = b'eG94Yi00OTE2ODYwNzg1LTY3NDM5MTYyODM4NTYtTTRoY0JEbTlZMk5XdzM2WFBNZHIxZURp'  # ffan_bot
+    token = base64.b64decode(encode_tok).decode()
     # todo: may configure token as env variable and use os.environ['SLACK_TOKEN']
-    token = os.environ['SLACK_TOKEN']
+    # token = os.environ['SLACK_TOKEN']
     client = slack.WebClient(token)
     try:
-      response = client.chat_postMessage(
-        channel=channel,
-        text=msg
-      )
-      print(response)
+        response = client.chat_postMessage(
+            channel=channel,
+            text=msg
+        )
+        print(response)
     except slack.errors.SlackApiError as e:
-      print(e)
+        print(e)
 
 
 def main():
-    post_msg("#my-bot", ":joy: \n :ox:")
+    post_msg("@ffan", ":joy: \n :ox:")
 
     '''
     # token = os.environ['SLACK_TOKEN']
