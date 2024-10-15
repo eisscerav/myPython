@@ -1,3 +1,4 @@
+import glob
 import os.path
 
 from bs4 import BeautifulSoup
@@ -286,14 +287,14 @@ def update_html():
     tag_id_test1 = soup.find(id="test1")
     if tag_id_test1:
         tag_id_test1["class"] = "ffan_v2"
-    with open('html/updated.html', 'w', encoding='utf-8') as file:
-        file.write(str(soup))
+    with open('html/updated.html', 'w', encoding='utf-8') as fp:
+        fp.write(str(soup))
     return
 
 
-def disable_negative_statements():
+def disable_negative_statements(html_report="report/bootstrap.cc.html"):
     disabled_lines = 0
-    soup = BeautifulSoup(open(os.path.join("report", "bootstrap.cc.html")), 'lxml')
+    soup = BeautifulSoup(open(html_report), 'lxml')
     all_no_cvg_tags = soup.find_all(class_="no-cvg fail-marker")
     num_no_cvg = len(all_no_cvg_tags)
     for no_cvg_tag in all_no_cvg_tags:
@@ -322,14 +323,64 @@ def disable_negative_statements():
         elif nccl_check_m1 or nccl_check_m2 or nccl_check_m3 or nccl_check_m4:
             no_cvg_tag["class"] = "na-cvg"
             disabled_lines += 1
-    with open('report/mod_bootstrap.cc.html', 'w', encoding='utf-8') as file:
-        file.write(str(soup))
+    with open(html_report, 'w', encoding='utf-8') as fp:
+        fp.write(str(soup))
+    return {html_report: disabled_lines}
+
+
+def update_total_grand(html_report="report/nccl_proj_metrics_report.html", lines=0, branches=0):
+    soup = BeautifulSoup(open(html_report), 'lxml')
+    tr_elements = soup.find_all("tr")
+    mod_times = 0
+    for tr in tr_elements:
+        th_col_units = tr.find_all("th")
+        if th_col_units and len(th_col_units) == 5:
+            b_total_data = False
+            for i, th in enumerate(th_col_units):
+                th_col_unit = th.get_text().strip()
+                if i == 0:
+                    if th_col_unit == "GRAND TOTALS":
+                        b_total_data = True
+                elif i == 3 and b_total_data:
+                    m = re.search(r"([0-9]+) / ([0-9]+) \(([0-9]+%)\)", th_col_unit)
+                    if m:
+                        tol_stat_covered_lines = m.group(1)
+                        tol_stat_total_lines = m.group(2)
+                        tol_stat_total_lines = int(tol_stat_total_lines) - lines
+                        lines_percentage = int(tol_stat_covered_lines) / int(tol_stat_total_lines) * 100
+                        # tol_stat_cov = m.group(3)
+                        th.string = f"{tol_stat_covered_lines} / {tol_stat_total_lines} ({lines_percentage:.2f}%)"
+                        mod_times += 1
+                elif i == 4 and b_total_data:
+                    m = re.search(r"([0-9]+) / ([0-9]+) \(([0-9]+%)\)", th_col_unit)
+                    if m:
+                        tol_covered_branch = m.group(1)
+                        tol_total_branch = m.group(2)
+                        tol_total_branch = int(tol_total_branch) - branches
+                        branch_percentage = int(tol_covered_branch) / int(tol_total_branch) * 100
+                        th.string = f"{tol_covered_branch} / {tol_total_branch} ({branch_percentage:.2f}%)"
+                        # tol_branch_cov = m.group(3)
+    with open(html_report, 'w', encoding='utf-8') as fp:
+        fp.write(str(soup))
     return
 
 
 def main():
     # demo()
-    disable_negative_statements()
+    total_disabled_lines = 0
+    # all_html = glob.glob("report/*.html")
+    all_html = ['report/nccl_proj_metrics_report.html', 'report/channel.cc.html', 'report/bootstrap.cc.html']
+    all_reports = []
+    for each_html in all_html:
+        if "nccl_proj_metrics_report.html" not in each_html:
+            ret = disable_negative_statements(each_html)
+            for k, v in ret.items():
+                update_total_grand(k, ret[k])
+            all_reports.append(ret)
+    for each in all_reports:
+        for k, v in each.items():
+            total_disabled_lines += v
+    update_total_grand("report/nccl_proj_metrics_report.html", total_disabled_lines)
     # coverity_report()
     # quick_start()
     # demo_search_tree()
