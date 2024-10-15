@@ -294,6 +294,7 @@ def update_html():
 
 def disable_negative_statements(html_report="report/bootstrap.cc.html"):
     disabled_lines = 0
+    disabled_branches = 0
     soup = BeautifulSoup(open(html_report), 'lxml')
     all_no_cvg_tags = soup.find_all(class_="no-cvg fail-marker")
     num_no_cvg = len(all_no_cvg_tags)
@@ -306,7 +307,7 @@ def disable_negative_statements(html_report="report/bootstrap.cc.html"):
         nccl_check_p4 = re.compile(r".*return RES;")
         common_err_p1 = re.compile(r".*return nccl([a-zA-Z]+);")
         common_err_p2 = re.compile(r"\s+(\d+) (\d+) (\d+)\s+;")
-        common_err_p3 = re.compile(r".*while (0);")
+        common_err_p3 = re.compile(r".*while \(0\);")
         nccl_check_m1 = re.search(nccl_check_p1, text)
         nccl_check_m2 = re.search(nccl_check_p2, text)
         nccl_check_m3 = re.search(nccl_check_p3, text)
@@ -314,18 +315,15 @@ def disable_negative_statements(html_report="report/bootstrap.cc.html"):
         common_m1 = re.search(common_err_p1, text)
         common_m2 = re.search(common_err_p2, text)
         common_m3 = re.search(common_err_p3, text)
-        if common_m1 and common_m1.group(1) != "Success":
+        if (common_m1 and common_m1.group(1) != "Success") or common_m2 or common_m3 or nccl_check_m3 or nccl_check_m4 \
+                or nccl_check_m1 or nccl_check_m2:
             no_cvg_tag["class"] = "na-cvg"
             disabled_lines += 1
-        elif common_m2 or common_m3:
-            no_cvg_tag["class"] = "na-cvg"
-            disabled_lines += 1
-        elif nccl_check_m1 or nccl_check_m2 or nccl_check_m3 or nccl_check_m4:
-            no_cvg_tag["class"] = "na-cvg"
-            disabled_lines += 1
+        if nccl_check_m1 or nccl_check_m2:
+            disabled_branches += 1
     with open(html_report, 'w', encoding='utf-8') as fp:
         fp.write(str(soup))
-    return {html_report: disabled_lines}
+    return {html_report: (disabled_lines, disabled_branches)}
 
 
 def update_total_grand(html_report="report/nccl_proj_metrics_report.html", lines=0, branches=0):
@@ -368,6 +366,7 @@ def update_total_grand(html_report="report/nccl_proj_metrics_report.html", lines
 def main():
     # demo()
     total_disabled_lines = 0
+    total_disabled_branches = 0
     # all_html = glob.glob("report/*.html")
     all_html = ['report/nccl_proj_metrics_report.html', 'report/channel.cc.html', 'report/bootstrap.cc.html']
     all_reports = []
@@ -375,16 +374,18 @@ def main():
         if "nccl_proj_metrics_report.html" not in each_html:
             ret = disable_negative_statements(each_html)
             for k, v in ret.items():
-                update_total_grand(k, ret[k])
+                update_total_grand(k, ret[k][0], ret[k][1])
             all_reports.append(ret)
     for each in all_reports:
         for k, v in each.items():
-            total_disabled_lines += v
-    update_total_grand("report/nccl_proj_metrics_report.html", total_disabled_lines)
+            total_disabled_lines += v[0]
+            total_disabled_branches += v[1]
+    update_total_grand("report/nccl_proj_metrics_report.html", total_disabled_lines, total_disabled_branches)
     # coverity_report()
     # quick_start()
     # demo_search_tree()
     # demo2()
+    return
 
 
 if __name__ == '__main__':
