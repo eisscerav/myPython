@@ -1,6 +1,9 @@
+import os.path
+
 from bs4 import BeautifulSoup
 import bs4
 import re
+from mako.template import Template
 
 # refer to https://beautiful-soup-4.readthedocs.io/en/latest/
 html_doc = """
@@ -17,9 +20,12 @@ and they lived at the bottom of a well.</p>
 <p class
 """
 
+
 ###################################################
 # soup = BeautifulSoup(open("index.html"))
 # soup = BeautifulSoup("<html>data</html>")
+# apt-get install Python-lxml
+# pip install lxml
 ###################################################
 def quick_start():
     soup = BeautifulSoup(html_doc, 'lxml')
@@ -210,14 +216,125 @@ def demo_update_tags():
     print(soup.prettify())
 
 
+def generate_html_report(project_name="coverity_nccl", td_items=[]):
+    report_name = f"{project_name}.html"
+
+    t = Template(filename='data/coverity_report.mako')
+    data = {
+        "project_name": project_name,
+        "td_items": td_items,
+    }
+    r = t.render(**data)
+    with open(report_name, "w") as fp:
+        fp.write(r)
+    return report_name
+
+
+def remove_similar_items(td_list):
+    ret = [td_list[0]]
+    del td_list[0]
+    b_similar = False
+    for td in td_list:
+        for each_ret in ret:
+            if each_ret.get("Checker") == td.get("Checker") and each_ret.get("file") == td.get("file") and \
+                    each_ret.get("Line") == td.get("Line") and each_ret.get("Classification") == td.get("Classification"):
+                b_similar = True
+                break
+        if b_similar:
+            b_similar = False
+        else:
+            ret.append(td)
+            b_similar = False
+    return ret
+
+
+def coverity_report():
+    original_td_elements = []
+    # soup = BeautifulSoup(open("index.html"), 'lxml')
+    soup = BeautifulSoup(open(os.path.join("html", "index.html")), 'lxml')
+    all_trs = soup.find_all(attrs={"bgcolor": "#F8F8F2"})
+    for tr in all_trs:
+        td_dict = {}
+        tr_tds = tr.find_all('td')
+        for i, tr_td in enumerate(tr_tds):
+            td_val = tr_td.get_text()
+            if i == 0:
+                td_dict['ID'] = td_val
+            elif i == 1:
+                td_dict['Checker'] = td_val
+            elif i == 2:
+                td_dict['tag_File'] = tr_td
+                td_dict['file_href'] = tr_td.find('a').get('href')
+                td_dict['File'] = td_val
+            elif i == 3:
+                td_dict['Line'] = td_val
+            elif i == 4:
+                td_val = td_val.replace("<", "&lt;")
+                td_val = td_val.replace(">", "&gt;")
+                td_dict['Function'] = td_val
+            elif i == 5:
+                td_dict['Classification'] = td_val
+        if td_dict:
+            original_td_elements.append(td_dict)
+    no_similar_tds = remove_similar_items(original_td_elements)
+    report_name = generate_html_report(td_items=no_similar_tds)
+    return report_name
+
+
+def update_html():
+    soup = BeautifulSoup(open(os.path.join("html", "set_value.html")), 'lxml')
+    tag_id_test1 = soup.find(id="test1")
+    if tag_id_test1:
+        tag_id_test1["class"] = "ffan_v2"
+    with open('html/updated.html', 'w', encoding='utf-8') as file:
+        file.write(str(soup))
+    return
+
+
+def disable_negative_statements():
+    disabled_lines = 0
+    soup = BeautifulSoup(open(os.path.join("report", "bootstrap.cc.html")), 'lxml')
+    all_no_cvg_tags = soup.find_all(class_="no-cvg fail-marker")
+    num_no_cvg = len(all_no_cvg_tags)
+    for no_cvg_tag in all_no_cvg_tags:
+        print(no_cvg_tag)
+        text = no_cvg_tag.text
+        nccl_check_p1 = re.compile(r".*if \(RES != ncclSuccess && RES != ncclInProgress\) {")
+        nccl_check_p2 = re.compile(r".*if \(ncclDebugNoWarn == 0\)")
+        nccl_check_p3 = re.compile(r".*ncclDebugLog\(NCCL_LOG_([a-zA-Z]+),*")
+        nccl_check_p4 = re.compile(r".*return RES;")
+        common_err_p1 = re.compile(r".*return nccl([a-zA-Z]+);")
+        common_err_p2 = re.compile(r"\s+(\d+) (\d+) (\d+)\s+;")
+        common_err_p3 = re.compile(r".*while (0);")
+        nccl_check_m1 = re.search(nccl_check_p1, text)
+        nccl_check_m2 = re.search(nccl_check_p2, text)
+        nccl_check_m3 = re.search(nccl_check_p3, text)
+        nccl_check_m4 = re.search(nccl_check_p4, text)
+        common_m1 = re.search(common_err_p1, text)
+        common_m2 = re.search(common_err_p2, text)
+        common_m3 = re.search(common_err_p3, text)
+        if common_m1 and common_m1.group(1) != "Success":
+            no_cvg_tag["class"] = "na-cvg"
+            disabled_lines += 1
+        elif common_m2 or common_m3:
+            no_cvg_tag["class"] = "na-cvg"
+            disabled_lines += 1
+        elif nccl_check_m1 or nccl_check_m2 or nccl_check_m3 or nccl_check_m4:
+            no_cvg_tag["class"] = "na-cvg"
+            disabled_lines += 1
+    with open('report/mod_bootstrap.cc.html', 'w', encoding='utf-8') as file:
+        file.write(str(soup))
+    return
+
+
 def main():
     # demo()
-    quick_start()
-    demo_search_tree()
+    disable_negative_statements()
+    # coverity_report()
+    # quick_start()
+    # demo_search_tree()
     # demo2()
 
 
 if __name__ == '__main__':
     main()
-
-
