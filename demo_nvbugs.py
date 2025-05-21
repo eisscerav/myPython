@@ -1,7 +1,8 @@
 import requests
-from requests.auth import HTTPBasicAuth
 import json
 import os
+from requests.auth import HTTPBasicAuth
+
 
 # user = r'nvidia.com\ffan'  # Your Nvidia NTAccount
 user = r'ffan'  # Your Nvidia NTAccount
@@ -21,9 +22,9 @@ class CudnnBug:
 
 
 def get_bug(bug_id=3470737):
-    bug_id = 3542339
+    # bug_id = 3542339
     url = "https://nvbugsapi.nvidia.com/nvbugswebserviceapi/api/bug/getbug/{}".format(bug_id)
-    token = os.environ.get('NVBUGS_TOKEN_FFAN')
+    token = os.environ.get('NVBUGS_TOKEN')
     headers = {
         'Content-type': 'application/json',
         'Authorization': 'Bearer '+token
@@ -90,7 +91,8 @@ def get_nvbugs():
         pages = total/100
     for i in range(pages):
         url = r"https://nvbugsapi.nvidia.com/NVBugsWebServiceApi/api/Search/GetBugs?page={}&limit=100".format(str(i+1))
-        response = requests.post(url, data=payload, auth=HTTPBasicAuth(user, password), headers=headers)
+        # response = requests.post(url, data=payload, auth=HTTPBasicAuth(user, password), headers=headers)
+        response = requests.post(url, data=payload, headers=headers)
         bugs = response.json().get('ReturnValue')
         for bug in bugs:
             bug_id.append(bug.get('BugId'))
@@ -104,6 +106,87 @@ def get_nvbugs():
     return bug_id
 
 
-if __name__ == '__main__':
+def get_nccl_bugs():
+    url = r"https://nvbugsapi.nvidia.com/NVBugsWebServiceApi/api/Search/GetBugs?page=1&limit=100"
+    token = os.environ.get("NVBUGS_TOKEN")
+    headers = {'Content-type': 'application/json',
+               'Authorization': "Bearer " + token}
+
+    data = [
+        {'FieldName': 'ModuleName', 'FieldValue': 'CUDA – NCCL'},
+        {'FieldName': 'Disposition', 'FieldValue': 'Bug - Fixed'}
+    ]
+
+    payload = json.dumps(data)
+    response = requests.post(url, data=payload, headers=headers)
+    toJson = response.json()
+    total = toJson.get('TotalCount')
+    pages = -1
+    bug_id = []
+    if total / 100:
+        pages = int(total / 100) + 1
+    else:
+        pages = total / 100
+    if os.environ.get('debug'):
+        pages = 1
+    for i in range(pages):
+        url = r"https://nvbugsapi.nvidia.com/NVBugsWebServiceApi/api/Search/GetBugs?page={}&limit=100".format(
+            str(i + 1))
+        print(f"requesting {url} ...")
+        response = requests.post(url, data=payload, headers=headers)
+        bugs = response.json().get('ReturnValue')
+        for bug in bugs:
+            bug_id.append(bug.get('BugId'))
+    bug_id = list(set(bug_id))
+    return bug_id
+
+
+def get_nccl_bug_details(bug_id):
+    print(f"get_nccl_bug_details {bug_id} ...")
+    url = "https://nvbugsapi.nvidia.com/nvbugswebserviceapi/api/bug/getbug/{}".format(bug_id)
+    token = os.environ.get('NVBUGS_TOKEN')
+    headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer ' + token
+    }
+    response = requests.get(url, headers=headers)
+    data = json.loads(response.text)
+    if data.get('IsSuccess'):
+        bug_detail = data.get('ReturnValue')
+        desc = bug_detail.get('DescriptionPlainTextReadOnly').split('\n')
+        severity = bug_detail.get('Severity').get("Value")
+        priority = bug_detail.get('Priority').get("Value")
+        tmp = []
+        for each in desc:
+            if each != "\r":
+                tmp.append(each)
+        desc_str = " ".join(tmp)
+        # comments = bug_detail.get('Comments')
+        # comm_list = []
+        # for comment in comments:
+        #     comt = comment.get("Comment")
+        #     if comt and comt != "":
+        #         comm_list.append(comt)
+        # comm_str = " ".join(comm_list)
+        ret = {"description": desc_str,
+               "bugId": bug_id, "severity": severity, "priority": priority}
+        return ret
+    return {}
+
+
+def main():
     # get_bug()
-    get_nvbugs()
+    bug_details = []
+    bugs_id = get_nccl_bugs()
+    if os.environ.get('debug'):
+        bugs_id = bugs_id[:10]
+    print(f"To query total {len(bugs_id)} bugs ...")
+    for each_id in bugs_id:
+        bug_details.append(get_nccl_bug_details(each_id))
+    with open("nccl_bugs.json", "w") as f:
+        json.dump(bug_details, f, indent=4)
+    return
+
+
+if __name__ == '__main__':
+    main()
